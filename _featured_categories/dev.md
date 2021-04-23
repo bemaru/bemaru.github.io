@@ -1,10 +1,10 @@
 ---
 layout: list
-title: TEST
-slug: test
+title: DEV
+slug: dev
 menu: true
 submenu: true
 order: 1
 description: >
-  테스트중입니다.
+  개발 경험 공유
 ---
