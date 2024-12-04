@@ -1,20 +1,34 @@
 # 홍길동
-소프트웨어 엔지니어
+> 소프트웨어 엔지니어
+
+## About Me
+10년차 소프트웨어 엔지니어로서 웹 개발 및 클라우드 아키텍처에 전문성을 가지고 있습니다.
+새로운 기술 습득과 팀 협업을 즐기며, 사용자 중심의 솔루션을 만드는 것을 지향합니다.
 
 ## 연락처
-* 이메일: example@email.com
-* 전화번호: 010-1234-5678
+📧 example@email.com  
+📱 010-1234-5678  
+💼 [LinkedIn](링크주소)  
+🔗 [GitHub](링크주소)
 
 ## 기술 스택
-* Python, JavaScript, Java
-* React, Vue.js
-* Django, Node.js
-* Docker, AWS
+### 언어
+- Python, JavaScript, Java
+
+### 프레임워크 & 라이브러리
+- Frontend: React, Vue.js
+- Backend: Django, Node.js
+
+### DevOps & 클라우드
+- Docker, AWS
 
 ## 경력사항
 ### 테크 컴퍼니 (2020.01 - 현재)
-* 주요 프로젝트 A 개발 및 운영
-* 팀 생산성 30% 향상
+**시니어 소프트웨어 엔지니어**
+- 주요 프로젝트 A 개발 및 운영
+  - 구체적인 성과나 사용 기술 설명
+- 팀 생산성 30% 향상
+  - 어떻게 향상시켰는지 구체적 설명
 
 ## 프로젝트
 ### 프로젝트 A

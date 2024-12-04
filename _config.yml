@@ -1,2 +1,9 @@
 title: "홍길동의 이력서"
-theme: minima 
+description: "소프트웨어 엔지니어 홍길동의 포트폴리오"
+theme: minima
+author: 홍길동
+
+# 소셜 미디어 링크 추가
+social_links:
+  github: your-github-handle
+  linkedin: your-linkedin-handle 
