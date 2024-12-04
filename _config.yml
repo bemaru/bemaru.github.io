@@ -1,7 +1,8 @@
-title: "홍길동의 이력서"
-description: "소프트웨어 엔지니어 홍길동의 포트폴리오"
+title: "resume"
+description: "소프트웨어 엔지니어 홍길동의 resume"
 theme: minima
 author: 홍길동
+remote_theme: sproogen/modern-resume-theme
 
 # 소셜 미디어 링크 추가
 social_links:
