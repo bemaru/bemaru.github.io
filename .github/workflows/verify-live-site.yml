@@ -1,0 +1,39 @@
+name: Verify live site
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify published homepage
+        shell: bash
+        run: |
+          expected='실무에서 배운 것을'
+
+          for attempt in $(seq 1 30); do
+            echo "Verification attempt ${attempt}/30"
+
+            if page="$(curl --fail --silent --show-error --location --max-time 20 https://bemaru.github.io/)"; then
+              if grep --fixed-strings --quiet "${expected}" <<< "${page}"; then
+                echo "GitHub Pages deployment verified."
+                exit 0
+              fi
+
+              echo "Homepage responded but expected content was not found."
+            else
+              echo "Homepage is not ready yet."
+            fi
+
+            sleep 10
+          done
+
+          echo "GitHub Pages deployment verification failed."
+          exit 1
