@@ -1,0 +1,16 @@
+---
+interface Props {
+  date: Date;
+}
+
+const { date } = Astro.props;
+const machineDate = date.toISOString().slice(0, 10);
+const humanDate = new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'Asia/Seoul',
+}).format(date);
+---
+
+<time datetime={machineDate}>{humanDate}</time>

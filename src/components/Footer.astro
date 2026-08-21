@@ -1,0 +1,15 @@
+---
+import { GITHUB_URL } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="shell footer-inner">
+    <p>© {year} bemaru</p>
+    <nav aria-label="보조 메뉴">
+      <a href="/rss.xml">RSS</a>
+      <a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a>
+    </nav>
+  </div>
+</footer>

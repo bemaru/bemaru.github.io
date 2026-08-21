@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getSitePosts } from '../../utils/content';
+import { collectTags } from '../../utils/tags';
+
+const tags = collectTags(await getSitePosts());
+---
+
+<BaseLayout title="Tags" description="기술 글을 태그별로 탐색합니다.">
+  <section class="page-header shell narrow">
+    <p class="eyebrow">Tags</p>
+    <h1>태그</h1>
+    <p>관심 있는 기술과 주제별로 글을 찾아볼 수 있습니다.</p>
+  </section>
+  <section class="section shell narrow">
+    {tags.length > 0 ? (
+      <ul class="tag-index">
+        {tags.map((tag) => (
+          <li>
+            <a href={`/tags/${tag.slug}/`}>
+              <span>#{tag.name}</span>
+              <strong>{tag.posts.length}</strong>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <EmptyState title="아직 태그가 없습니다." description="글이 공개되면 태그도 함께 표시됩니다." />
+    )}
+  </section>
+</BaseLayout>
