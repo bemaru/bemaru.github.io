@@ -1,0 +1,56 @@
+name: Bootstrap site
+
+on:
+  push:
+    branches:
+      - feat/initial-blog
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bootstrap-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Verify and restore site bundle
+        run: |
+          cat .bootstrap/part-* | base64 --decode > /tmp/site.tar.gz
+          echo "f92deb0e39d287cc93ee9cf37cbc3364d08a0ef6b158332e46bca798f65c0991  /tmp/site.tar.gz" | sha256sum --check -
+          tar -xzf /tmp/site.tar.gz -C .
+          rm -rf .bootstrap
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Generate lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate site
+        env:
+          INCLUDE_DRAFTS: "true"
+        run: npm run validate
+
+      - name: Commit clean site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "feat: bootstrap Astro developer blog"
+          git push
