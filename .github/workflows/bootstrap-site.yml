@@ -1,27 +1,33 @@
 name: Bootstrap site
 
 on:
-  push:
+  pull_request:
     branches:
-      - feat/initial-blog
-  workflow_dispatch:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 permissions:
   contents: write
 
 concurrency:
-  group: bootstrap-${{ github.ref }}
+  group: bootstrap-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   bootstrap:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && github.head_ref == 'feat/initial-blog'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-      - name: Checkout
+      - name: Checkout feature branch
         uses: actions/checkout@v7
+        with:
+          ref: feat/initial-blog
+          fetch-depth: 0
 
       - name: Verify and restore site bundle
         run: |
@@ -53,4 +59,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add --all
           git commit -m "feat: bootstrap Astro developer blog"
-          git push
+          git push origin HEAD:feat/initial-blog
