@@ -1,0 +1,18 @@
+---
+import { tagToSlug } from '../utils/tags';
+
+interface Props {
+  tags: string[];
+  linked?: boolean;
+}
+
+const { tags, linked = true } = Astro.props;
+---
+
+<ul class="tag-list" aria-label="태그">
+  {tags.map((tag) => (
+    <li>
+      {linked ? <a href={`/tags/${tagToSlug(tag)}/`}>#{tag}</a> : <span>#{tag}</span>}
+    </li>
+  ))}
+</ul>

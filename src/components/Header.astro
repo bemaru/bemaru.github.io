@@ -1,0 +1,31 @@
+---
+import { GITHUB_URL } from '../consts';
+
+const pathname = Astro.url.pathname;
+const links = [
+  { href: '/writing/', label: 'Writing' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/about/', label: 'About' },
+];
+
+const isActive = (href: string) =>
+  pathname === href || pathname.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="/" aria-label="bemaru 홈">
+      bemaru<span aria-hidden="true">.</span>
+    </a>
+    <nav class="main-nav" aria-label="주요 메뉴">
+      {links.map((link) => (
+        <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+          {link.label}
+        </a>
+      ))}
+      <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+        GitHub<span class="sr-only"> 새 창</span>
+      </a>
+    </nav>
+  </div>
+</header>
