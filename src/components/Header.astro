@@ -3,9 +3,11 @@ import { GITHUB_URL } from '../consts';
 
 const pathname = Astro.url.pathname;
 const links = [
-  { href: '/writing/', label: 'Writing' },
-  { href: '/projects/', label: 'Projects' },
-  { href: '/about/', label: 'About' },
+  { href: '/writing/', label: '글' },
+  { href: '/series/', label: '시리즈' },
+  { href: '/categories/', label: '카테고리' },
+  { href: '/projects/', label: '프로젝트' },
+  { href: '/about/', label: '소개' },
 ];
 
 const isActive = (href: string) =>
@@ -17,15 +19,37 @@ const isActive = (href: string) =>
     <a class="brand" href="/" aria-label="bemaru 홈">
       bemaru<span aria-hidden="true">.</span>
     </a>
-    <nav class="main-nav" aria-label="주요 메뉴">
+
+    <nav class="main-nav desktop-nav" aria-label="주요 메뉴">
       {links.map((link) => (
-        <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+        <a
+          class="nav-link"
+          href={link.href}
+          aria-current={isActive(link.href) ? 'page' : undefined}
+        >
           {link.label}
         </a>
       ))}
-      <a href={GITHUB_URL} target="_blank" rel="noreferrer">
-        GitHub<span class="sr-only"> 새 창</span>
+      <a
+        class="nav-link nav-link-search"
+        href="/search/"
+        aria-current={isActive('/search/') ? 'page' : undefined}
+      >
+        검색
       </a>
     </nav>
+
+    <details class="mobile-nav">
+      <summary aria-label="메뉴 열기">메뉴</summary>
+      <nav class="mobile-nav-panel" aria-label="모바일 메뉴">
+        {links.map((link) => (
+          <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))}
+        <a href="/search/">검색</a>
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </details>
   </div>
 </header>

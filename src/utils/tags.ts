@@ -6,8 +6,8 @@ export interface TagGroup {
   posts: Post[];
 }
 
-export function tagToSlug(tag: string): string {
-  const slug = tag
+export function slugify(value: string, label = '값'): string {
+  const slug = value
     .trim()
     .normalize('NFKC')
     .toLocaleLowerCase('ko-KR')
@@ -17,10 +17,14 @@ export function tagToSlug(tag: string): string {
     .replace(/^-+|-+$/g, '');
 
   if (!slug) {
-    throw new Error(`태그를 URL로 변환할 수 없습니다: ${tag}`);
+    throw new Error(`${label}을 URL로 변환할 수 없습니다: ${value}`);
   }
 
   return slug;
+}
+
+export function tagToSlug(tag: string): string {
+  return slugify(tag, '태그');
 }
 
 export function collectTags(posts: Post[]): TagGroup[] {

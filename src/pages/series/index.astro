@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getSitePosts } from '../../utils/content';
+import { collectSeries } from '../../utils/series';
+
+const seriesGroups = collectSeries(await getSitePosts());
+---
+
+<BaseLayout
+  title="시리즈"
+  description="하나의 주제를 여러 글에 걸쳐 단계적으로 정리한 기술 시리즈입니다."
+  noindex={seriesGroups.length === 0}
+>
+  <section class="page-header shell">
+    <p class="page-eyebrow">Series</p>
+    <h1>시리즈</h1>
+    <p>서로 연결된 글을 순서대로 읽을 수 있습니다.</p>
+  </section>
+
+  <section class="section shell">
+    {seriesGroups.length > 0 ? (
+      <div class="series-grid">
+        {seriesGroups.map((series) => (
+          <a class="series-card" href={`/series/${series.slug}/`}>
+            <span>{series.posts.length}개의 글</span>
+            <h2>{series.name}</h2>
+            <ol class="series-card-list">
+              {series.posts.slice(0, 3).map((post) => (
+                <li>{post.data.title}</li>
+              ))}
+            </ol>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <EmptyState
+        title="아직 공개된 시리즈가 없습니다."
+        description="관련 글이 두 개 이상 쌓이면 시리즈로 연결합니다."
+      />
+    )}
+  </section>
+</BaseLayout>
