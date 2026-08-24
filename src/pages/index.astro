@@ -2,86 +2,111 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EmptyState from '../components/EmptyState.astro';
 import PostCard from '../components/PostCard.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import { getSitePosts, getSiteProjects } from '../utils/content';
+import SearchForm from '../components/SearchForm.astro';
+import { CATEGORIES } from '../consts';
+import { getCategoryCount } from '../utils/categories';
+import { getSitePosts } from '../utils/content';
+import { collectSeries } from '../utils/series';
 
 const posts = await getSitePosts();
-const projects = await getSiteProjects();
-const latestPosts = posts.slice(0, 4);
-const featuredProjects = projects.filter((project) => project.data.featured).slice(0, 3);
+const latestPosts = posts.slice(0, 6);
+const seriesGroups = collectSeries(posts).slice(0, 3);
+const categoryCards = CATEGORIES.map((category) => ({
+  ...category,
+  count: getCategoryCount(posts, category.slug),
+}));
 ---
 
 <BaseLayout>
-  <section class="hero shell">
-    <p class="eyebrow">Backend · Security · AI Agent Engineering</p>
-    <h1>실무에서 배운 것을,<br />다시 쓸 수 있는 지식으로.</h1>
+  <section class="blog-hero shell">
+    <p class="hero-kicker">Backend · Security · AI Agent Engineering</p>
+    <h1>실무에서 검증한 기술을,<br />다시 찾을 수 있는 기록으로.</h1>
     <p class="hero-copy">
-      문제를 해결한 과정, 기술적 의사결정, 실패와 개선을 기록합니다.
-      짧은 팁보다 다음 프로젝트에서도 재사용할 수 있는 맥락을 남기는 것이 목표입니다.
+      문제를 해결한 과정, 선택의 근거, 실패와 개선을 기록합니다.
+      유행을 요약하기보다 실제 시스템에서 다시 사용할 수 있는 맥락을 남깁니다.
     </p>
-    <div class="hero-actions">
-      <a class="button primary" href="/writing/">글 보기</a>
-      <a class="button secondary" href="/about/">소개</a>
+    <SearchForm />
+    <div class="hero-meta">
+      <a href="/writing/">전체 글 {posts.length}</a>
+      <a href="/archive/">연도별 보관함</a>
+      <a href="/rss.xml">RSS 구독</a>
     </div>
   </section>
 
   <section class="section shell">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">Focus</p>
-        <h2>다루는 주제</h2>
-      </div>
-    </div>
-    <div class="focus-grid">
-      <article>
-        <span>01</span>
-        <h3>AI Agent Engineering</h3>
-        <p>도구 호출, 오케스트레이션, 평가와 운영 경계를 실제 시스템 관점에서 정리합니다.</p>
-      </article>
-      <article>
-        <span>02</span>
-        <h3>Backend & Search</h3>
-        <p>Python, Go, OpenSearch를 중심으로 서비스 설계와 장애 해결 과정을 기록합니다.</p>
-      </article>
-      <article>
-        <span>03</span>
-        <h3>Security Engineering</h3>
-        <p>EDR와 탐지 시스템을 개발하며 배운 보안 도메인 지식과 엔지니어링 판단을 다룹니다.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="section shell">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">Latest</p>
+        <p class="section-eyebrow">Latest</p>
         <h2>최근 글</h2>
       </div>
-      <a class="text-link" href="/writing/">전체 글 →</a>
+      <a class="text-link" href="/writing/">전체 글 보기 →</a>
     </div>
+
     {latestPosts.length > 0 ? (
-      <div class="content-list">
+      <div class="post-list">
         {latestPosts.map((post) => <PostCard post={post} />)}
       </div>
     ) : (
       <EmptyState
-        title="공개 글을 준비하고 있습니다."
-        description="검토가 끝난 글부터 순차적으로 공개합니다."
-      />
+        title="첫 공개 글을 준비하고 있습니다."
+        description="공개 가능한 원고만 검토 후 발행합니다. 검색과 분류 구조는 이미 준비되어 있습니다."
+      >
+        <a class="text-link" href="/about/">블로그 운영 원칙 보기 →</a>
+      </EmptyState>
     )}
   </section>
 
-  {featuredProjects.length > 0 && (
+  <section class="section section-muted">
+    <div class="shell">
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Categories</p>
+          <h2>주제별 탐색</h2>
+        </div>
+        <a class="text-link" href="/categories/">카테고리 보기 →</a>
+      </div>
+
+      <div class="category-grid">
+        {categoryCards.map((category) => (
+          category.count > 0 ? (
+            <a class="category-card" href={`/categories/${category.slug}/`}>
+              <div class="category-card-head">
+                <h3>{category.name}</h3>
+                <span>{category.count}</span>
+              </div>
+              <p>{category.description}</p>
+            </a>
+          ) : (
+            <div class="category-card category-card-disabled">
+              <div class="category-card-head">
+                <h3>{category.name}</h3>
+                <span>0</span>
+              </div>
+              <p>{category.description}</p>
+            </div>
+          )
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {seriesGroups.length > 0 && (
     <section class="section shell">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Selected</p>
-          <h2>프로젝트</h2>
+          <p class="section-eyebrow">Series</p>
+          <h2>이어 읽기</h2>
         </div>
-        <a class="text-link" href="/projects/">전체 프로젝트 →</a>
+        <a class="text-link" href="/series/">전체 시리즈 →</a>
       </div>
-      <div class="project-grid">
-        {featuredProjects.map((project) => <ProjectCard project={project} />)}
+      <div class="series-grid">
+        {seriesGroups.map((series) => (
+          <a class="series-card" href={`/series/${series.slug}/`}>
+            <span>{series.posts.length}개의 글</span>
+            <h3>{series.name}</h3>
+            <p>{series.posts[0]?.data.description}</p>
+          </a>
+        ))}
       </div>
     </section>
   )}

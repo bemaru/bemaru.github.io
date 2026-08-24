@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { getCategory } from '../../utils/categories';
+import { getSitePosts, groupPostsByYear } from '../../utils/content';
+
+const groups = groupPostsByYear(await getSitePosts());
+---
+
+<BaseLayout
+  title="보관함"
+  description="연도별로 정리한 기술 글 보관함입니다."
+  noindex={groups.size === 0}
+>
+  <section class="page-header shell">
+    <p class="page-eyebrow">Archive</p>
+    <h1>보관함</h1>
+    <p>게시 날짜를 기준으로 전체 글을 연도별로 정리합니다.</p>
+  </section>
+
+  <section class="section shell narrow">
+    {groups.size > 0 ? (
+      <div class="archive-list">
+        {[...groups.entries()].map(([year, posts]) => (
+          <section class="archive-year">
+            <h2>{year}</h2>
+            <ol>
+              {posts.map((post) => {
+                const category = getCategory(post.data.category);
+                return (
+                  <li>
+                    <FormattedDate date={post.data.publishedAt} />
+                    <a href={`/writing/${post.id}/`}>{post.data.title}</a>
+                    <span>{category.name}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        ))}
+      </div>
+    ) : (
+      <EmptyState title="보관된 글이 없습니다." description="첫 글이 발행되면 연도별 보관함이 생성됩니다." />
+    )}
+  </section>
+</BaseLayout>
