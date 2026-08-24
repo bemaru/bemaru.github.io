@@ -1,0 +1,48 @@
+name: Verify content-first live site
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify deployed pages
+        shell: bash
+        run: |
+          base='https://bemaru.github.io'
+          expected='실무에서 검증한 기술을'
+
+          for attempt in $(seq 1 30); do
+            echo "Verification attempt ${attempt}/30"
+
+            home_status="$(curl --silent --location --output /tmp/home.html --write-out '%{http_code}' --max-time 20 "${base}/" || true)"
+            search_status="$(curl --silent --location --output /tmp/search.html --write-out '%{http_code}' --max-time 20 "${base}/search/" || true)"
+            categories_status="$(curl --silent --location --output /tmp/categories.html --write-out '%{http_code}' --max-time 20 "${base}/categories/" || true)"
+            privacy_status="$(curl --silent --location --output /tmp/privacy.html --write-out '%{http_code}' --max-time 20 "${base}/privacy/" || true)"
+            old_post_status="$(curl --silent --location --output /tmp/old-post.html --write-out '%{http_code}' --max-time 20 "${base}/writing/restarting-developer-blog/" || true)"
+
+            if [[ "${home_status}" == '200' ]] \
+              && grep --fixed-strings --quiet "${expected}" /tmp/home.html \
+              && [[ "${search_status}" == '200' ]] \
+              && grep --fixed-strings --quiet '제목, 설명, 태그, 카테고리와 시리즈' /tmp/search.html \
+              && [[ "${categories_status}" == '200' ]] \
+              && grep --fixed-strings --quiet 'AI Engineering' /tmp/categories.html \
+              && [[ "${privacy_status}" == '200' ]] \
+              && [[ "${old_post_status}" == '404' ]]; then
+              echo 'Content-first GitHub Pages deployment verified.'
+              exit 0
+            fi
+
+            echo "home=${home_status} search=${search_status} categories=${categories_status} privacy=${privacy_status} old_post=${old_post_status}"
+            sleep 10
+          done
+
+          echo 'Live-site verification failed.'
+          exit 1
