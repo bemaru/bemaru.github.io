@@ -26,20 +26,38 @@ const resolvedCanonical = canonicalUrl
   ? new URL(canonicalUrl)
   : new URL(canonicalPath, site);
 const resolvedImage = new URL(imagePath, site);
+const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+const naverVerification = import.meta.env.PUBLIC_NAVER_SITE_VERIFICATION;
+const adsenseClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const robots = noindex
+  ? 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1';
 ---
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
 <meta name="description" content={description} />
-<meta name="theme-color" content="#0f172a" />
+<meta name="author" content="bemaru" />
+<meta name="robots" content={robots} />
+<meta name="theme-color" content="#f7f7f4" />
 <meta name="color-scheme" content="light dark" />
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{googleVerification && (
+  <meta name="google-site-verification" content={googleVerification} />
+)}
+{naverVerification && (
+  <meta name="naver-site-verification" content={naverVerification} />
+)}
 
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="manifest" href="/site.webmanifest" />
 <link rel="canonical" href={resolvedCanonical} />
-<link rel="alternate" type="application/rss+xml" title={`${SITE_TITLE} RSS`} href="/rss.xml" />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={`${SITE_TITLE} RSS`}
+  href="/rss.xml"
+/>
 
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={SITE_TITLE} />
@@ -48,6 +66,7 @@ const resolvedImage = new URL(imagePath, site);
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={resolvedImage} />
+<meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 
@@ -55,5 +74,14 @@ const resolvedImage = new URL(imagePath, site);
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={resolvedImage} />
+
+{adsenseClient && (
+  <script
+    is:inline
+    async
+    crossorigin="anonymous"
+    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+  ></script>
+)}
 
 <title>{title}</title>

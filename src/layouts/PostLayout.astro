@@ -1,28 +1,71 @@
 ---
 import type { Post } from '../utils/content';
+import { getCategory } from '../utils/categories';
 import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import PostCard from '../components/PostCard.astro';
 import TagList from '../components/TagList.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
 
 interface Props {
   post: Post;
+  headings: Heading[];
+  newerPost?: Post;
+  olderPost?: Post;
+  relatedPosts?: Post[];
+  seriesPosts?: Post[];
 }
 
-const { post } = Astro.props;
+const {
+  post,
+  headings,
+  newerPost,
+  olderPost,
+  relatedPosts = [],
+  seriesPosts = [],
+} = Astro.props;
+const category = getCategory(post.data.category);
 const canonicalPath = `/writing/${post.id}/`;
+const site = Astro.site ?? new URL(Astro.url.origin);
+const tocHeadings = headings.filter((heading) =>
+  [2, 3].includes(heading.depth),
+);
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.data.title,
   description: post.data.description,
+  image: new URL('/og-default.png', site).href,
   datePublished: post.data.publishedAt.toISOString(),
   dateModified: (post.data.updatedAt ?? post.data.publishedAt).toISOString(),
-  mainEntityOfPage: new URL(canonicalPath, Astro.site ?? Astro.url.origin).href,
+  articleSection: category.name,
+  keywords: post.data.tags.join(', '),
+  mainEntityOfPage: new URL(canonicalPath, site).href,
   author: {
     '@type': 'Person',
     name: 'bemaru',
-    url: new URL('/about/', Astro.site ?? Astro.url.origin).href,
+    url: new URL('/about/', site).href,
   },
+};
+const breadcrumbData = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '홈', item: new URL('/', site).href },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: category.name,
+      item: new URL(`/categories/${category.slug}/`, site).href,
+    },
+    { '@type': 'ListItem', position: 3, name: post.data.title },
+  ],
 };
 ---
 
@@ -41,32 +84,138 @@ const structuredData = {
       <meta property="article:modified_time" content={post.data.updatedAt.toISOString()} />
     )}
     {post.data.tags.map((tag) => <meta property="article:tag" content={tag} />)}
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbData)}></script>
   </Fragment>
 
-  <article class="article-detail">
+  <article class="article-detail shell">
+    <Breadcrumbs
+      items={[
+        { label: '홈', href: '/' },
+        { label: category.name, href: `/categories/${category.slug}/` },
+        { label: post.data.title },
+      ]}
+    />
+
     <header class="article-header">
-      <div class="eyebrow-row">
-        <span class="eyebrow">Writing</span>
+      <div class="article-kicker-row">
+        <a class="category-label" href={`/categories/${category.slug}/`}>
+          {category.name}
+        </a>
         {post.data.draft && <span class="status-badge">Draft</span>}
       </div>
       <h1>{post.data.title}</h1>
       <p class="article-description">{post.data.description}</p>
-      <div class="article-dates">
+      <div class="article-meta">
         <span>작성 <FormattedDate date={post.data.publishedAt} /></span>
         {post.data.updatedAt && (
           <span>수정 <FormattedDate date={post.data.updatedAt} /></span>
         )}
       </div>
+      {post.data.series && (
+        <p class="article-series-link">
+          <a href={`/series/${post.data.series.slug}/`}>
+            {post.data.series.name} #{post.data.series.order}
+          </a>
+        </p>
+      )}
       {post.data.tags.length > 0 && <TagList tags={post.data.tags} />}
     </header>
 
-    <div class="prose">
-      <slot />
-    </div>
+    <div class:list={['article-body-grid', tocHeadings.length > 1 && 'has-toc']}>
+      <div class="article-main">
+        {post.data.series && seriesPosts.length > 1 && (
+          <aside class="series-panel" aria-label="시리즈 글 목록">
+            <p class="series-panel-title">{post.data.series.name}</p>
+            <ol>
+              {seriesPosts.map((seriesPost) => (
+                <li class:list={{ current: seriesPost.id === post.id }}>
+                  <a href={`/writing/${seriesPost.id}/`}>
+                    {seriesPost.data.series?.order}. {seriesPost.data.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        )}
 
-    <footer class="article-footer">
-      <a class="back-link" href="/writing/">← Writing 목록</a>
-    </footer>
+        <div class="prose">
+          <slot />
+        </div>
+
+        <nav class="adjacent-posts" aria-label="이전 및 다음 글">
+          {newerPost ? (
+            <a class="adjacent-card" href={`/writing/${newerPost.id}/`}>
+              <span>새로운 글</span>
+              <strong>{newerPost.data.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )}
+          {olderPost && (
+            <a class="adjacent-card adjacent-card-next" href={`/writing/${olderPost.id}/`}>
+              <span>이전 글</span>
+              <strong>{olderPost.data.title}</strong>
+            </a>
+          )}
+        </nav>
+
+        {relatedPosts.length > 0 && (
+          <section class="related-section">
+            <div class="section-heading compact-heading">
+              <div>
+                <p class="section-eyebrow">Related</p>
+                <h2>관련 글</h2>
+              </div>
+            </div>
+            <div class="post-list compact-list">
+              {relatedPosts.map((relatedPost) => (
+                <PostCard post={relatedPost} headingLevel={3} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {tocHeadings.length > 1 && (
+        <aside class="article-sidebar">
+          <nav class="toc" aria-label="목차">
+            <p>목차</p>
+            <ol>
+              {tocHeadings.map((heading) => (
+                <li class:list={{ 'toc-depth-3': heading.depth === 3 }}>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+      )}
+    </div>
   </article>
+
+  <script>
+    const blocks = document.querySelectorAll('.prose pre');
+
+    for (const block of blocks) {
+      if (block.querySelector('.copy-code')) continue;
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy-code';
+      button.textContent = '복사';
+      button.setAttribute('aria-label', '코드 복사');
+
+      button.addEventListener('click', async () => {
+        const code = block.querySelector('code')?.textContent ?? '';
+        await navigator.clipboard.writeText(code);
+        button.textContent = '복사됨';
+        window.setTimeout(() => {
+          button.textContent = '복사';
+        }, 1600);
+      });
+
+      block.append(button);
+    }
+  </script>
 </BaseLayout>

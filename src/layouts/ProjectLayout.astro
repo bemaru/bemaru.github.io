@@ -1,6 +1,7 @@
 ---
 import type { Project } from '../utils/content';
 import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import TagList from '../components/TagList.astro';
 
 interface Props {
@@ -17,23 +18,30 @@ const { project } = Astro.props;
   noindex={project.data.draft}
   contentClass="article-shell"
 >
-  <article class="article-detail">
-    <header class="article-header">
-      <div class="eyebrow-row">
-        <span class="eyebrow">Project</span>
+  <article class="project-detail shell narrow">
+    <Breadcrumbs
+      items={[
+        { label: '홈', href: '/' },
+        { label: '프로젝트', href: '/projects/' },
+        { label: project.data.title },
+      ]}
+    />
+
+    <header class="article-header project-header">
+      <div class="article-kicker-row">
+        <span class="category-label">Project · {project.data.period}</span>
         {project.data.draft && <span class="status-badge">Draft</span>}
       </div>
       <h1>{project.data.title}</h1>
       <p class="article-description">{project.data.description}</p>
-      <p class="project-period">{project.data.period}</p>
-      {project.data.tags.length > 0 && <TagList tags={project.data.tags} linked={false} />}
+      {project.data.tags.length > 0 && <TagList tags={project.data.tags} />}
       {project.data.links && (
         <div class="project-links">
           {project.data.links.github && (
-            <a class="button secondary" href={project.data.links.github} target="_blank" rel="noreferrer">GitHub</a>
+            <a href={project.data.links.github} target="_blank" rel="noreferrer">GitHub</a>
           )}
           {project.data.links.demo && (
-            <a class="button primary" href={project.data.links.demo} target="_blank" rel="noreferrer">Demo</a>
+            <a href={project.data.links.demo} target="_blank" rel="noreferrer">Demo</a>
           )}
         </div>
       )}
@@ -42,9 +50,5 @@ const { project } = Astro.props;
     <div class="prose">
       <slot />
     </div>
-
-    <footer class="article-footer">
-      <a class="back-link" href="/projects/">← Projects 목록</a>
-    </footer>
   </article>
 </BaseLayout>
