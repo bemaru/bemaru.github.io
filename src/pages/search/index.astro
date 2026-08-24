@@ -35,6 +35,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   </section>
 
   <script>
+    interface SearchItem {
+      title: string;
+      description: string;
+      url: string;
+      publishedAt: string;
+      category: string;
+      categorySlug: string;
+      series: string;
+      tags: string[];
+    }
+
+    interface SearchMatch {
+      item: SearchItem;
+      score: number;
+    }
+
     const form = document.querySelector('#search-form');
     const input = document.querySelector('#search-query');
     const summary = document.querySelector('#search-summary');
@@ -46,10 +62,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       summary instanceof HTMLElement &&
       results instanceof HTMLElement
     ) {
-      const normalize = (value) =>
+      const normalize = (value: string): string =>
         value.normalize('NFKC').toLocaleLowerCase('ko-KR').trim();
 
-      const createResult = (item) => {
+      const createResult = (item: SearchItem): HTMLElement => {
         const article = document.createElement('article');
         article.className = 'search-result-card';
 
@@ -80,12 +96,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         return article;
       };
 
-      const indexPromise = fetch('/search-index.json').then((response) => {
-        if (!response.ok) throw new Error('검색 색인을 불러오지 못했습니다.');
-        return response.json();
-      });
+      const indexPromise: Promise<SearchItem[]> = fetch('/search-index.json').then(
+        (response) => {
+          if (!response.ok) throw new Error('검색 색인을 불러오지 못했습니다.');
+          return response.json() as Promise<SearchItem[]>;
+        },
+      );
 
-      const runSearch = async (rawQuery) => {
+      const runSearch = async (rawQuery: string): Promise<void> => {
         const query = normalize(rawQuery);
         results.replaceChildren();
 
@@ -100,12 +118,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           const items = await indexPromise;
           const terms = query.split(/\s+/).filter(Boolean);
           const matches = items
-            .map((item) => {
+            .map((item): SearchMatch | null => {
               const title = normalize(item.title);
               const description = normalize(item.description);
               const category = normalize(item.category);
               const series = normalize(item.series);
-              const tags = item.tags.map(normalize);
+              const tags = item.tags.map((tag) => normalize(tag));
               const haystack = [title, description, category, series, ...tags].join(' ');
 
               if (!terms.every((term) => haystack.includes(term))) {
@@ -124,7 +142,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
               return { item, score };
             })
-            .filter(Boolean)
+            .filter((match): match is SearchMatch => match !== null)
             .sort(
               (a, b) =>
                 b.score - a.score ||
@@ -155,12 +173,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         const url = new URL(window.location.href);
         query ? url.searchParams.set('q', query) : url.searchParams.delete('q');
         history.replaceState(null, '', url);
-        runSearch(query);
+        void runSearch(query);
       });
 
       const initialQuery = new URLSearchParams(window.location.search).get('q') ?? '';
       input.value = initialQuery;
-      runSearch(initialQuery);
+      void runSearch(initialQuery);
     }
   </script>
 </BaseLayout>

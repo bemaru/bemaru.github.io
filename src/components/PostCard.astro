@@ -11,7 +11,6 @@ interface Props {
 
 const { post, headingLevel = 3 } = Astro.props;
 const category = getCategory(post.data.category);
-const Heading = `h${headingLevel}` as const;
 ---
 
 <article class="post-card">
@@ -24,9 +23,15 @@ const Heading = `h${headingLevel}` as const;
     {post.data.draft && <span class="status-badge">Draft</span>}
   </div>
 
-  <Heading class="post-card-title">
-    <a href={`/writing/${post.id}/`}>{post.data.title}</a>
-  </Heading>
+  {headingLevel === 2 ? (
+    <h2 class="post-card-title">
+      <a href={`/writing/${post.id}/`}>{post.data.title}</a>
+    </h2>
+  ) : (
+    <h3 class="post-card-title">
+      <a href={`/writing/${post.id}/`}>{post.data.title}</a>
+    </h3>
+  )}
   <p class="post-card-description">{post.data.description}</p>
 
   {post.data.series && (
