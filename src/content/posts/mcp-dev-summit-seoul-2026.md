@@ -16,6 +16,13 @@ tags:
 
 2026년 8월 13–14일 · 그랜드 인터컨티넨탈 서울 파르나스
 
+<figure>
+
+![MCP Dev Summit 무대와 객석이 보이는 그랜드 볼룸 전경](../../assets/posts/mcp-dev-summit-seoul-2026/ballroom.webp)
+
+<figcaption>둘째 날 마지막 세션을 마친 뒤의 그랜드 볼룸.</figcaption>
+</figure>
+
 ## 전체 소감
 
 개인적으로는 에이전트를 개발하며 고민했던 MCP의 적용 경계, 기능 범위, 기존 API를 MCP 도구로 전환하는 과정이 여러 발표의 주제와 맞닿아 있어 특히 와닿았습니다. 비슷한 문제 해결 과정을 다른 사례와 비교하면서 새롭게 살펴볼 관점도 얻었습니다.
@@ -57,6 +64,13 @@ API 엔드포인트를 일대일로 노출하면 도구 선택이 어려워지�
 
 MCP 생태계가 성장한 이후 필요한 레지스트리, 검색, 자격 증명, 가드레일과 감사 등의 운영 체계를 다뤘습니다.
 
+<figure>
+
+![Two Years of MCP 제목이 띄워진 첫날 키노트 무대](../../assets/posts/mcp-dev-summit-seoul-2026/keynote.webp)
+
+<figcaption>첫날 키노트. Den Delimarsky(Anthropic)의 Two Years of MCP 발표.</figcaption>
+</figure>
+
 #### [Stateful AI Agents: Building Consistent Systems with MCP and Distributed SQL](https://mcpseoul2026.sched.com/event/2TLPA/stateful-ai-agents-building-consistent-systems-with-mcp-and-distributed-sql-nasiullha-chaudhari-yugabytedb)
 
 <small>연사: Nasiullha Chaudhari (YugabyteDB)</small>
@@ -74,6 +88,24 @@ MCP 생태계가 성장한 이후 필요한 레지스트리, 검색, 자격 증�
 <small>연사: Nimit Savant · Gokul K S (DevRev)</small>
 
 API 기능을 그대로 나열하지 않고 에이전트의 의도와 작업 흐름에 맞게 도구를 줄이고 재구성하는 방법을 다뤘습니다.
+
+<div class="photo-pair">
+
+<figure>
+
+![행사장 창가에 세워진 MCP Dev Summit Seoul 배너](../../assets/posts/mcp-dev-summit-seoul-2026/event-banner.webp)
+
+<figcaption>점심시간에 담은 행사장 배너.</figcaption>
+</figure>
+
+<figure>
+
+![첫날 점심으로 제공된 도시락과 국](../../assets/posts/mcp-dev-summit-seoul-2026/day-one-lunch.webp)
+
+<figcaption>첫날 점심으로 나온 도시락.</figcaption>
+</figure>
+
+</div>
 
 #### [Who Watches the Watchmen? Safe AI-Agent Failover Via MCP and CRDs](https://mcpseoul2026.sched.com/event/2PYeZ/who-watches-the-watchmen-safe-ai-agent-failover-via-mcp-and-crds-phuong-bac-ta-research-center-for-distributed-cloud-and-networking-ssu-south-korea-vitumbiko-mafeni-cnlab-ssu-iistrc)
 
@@ -101,13 +133,6 @@ API 기능을 그대로 나열하지 않고 에이전트의 의도와 작업 흐
 
 데모에서는 근거를 확인할 수 없는 요청에 `INDETERMINATE`(판단 불가)를 반환했습니다.
 
-<figure>
-
-![근거를 확인할 수 없어 INDETERMINATE를 반환한 발표 데모](../../assets/posts/mcp-dev-summit-seoul-2026/indeterminate-demo.webp)
-
-<figcaption>Sunyoung Park(KC-ML2), Stop Wrapping APIs. 판단 불가를 결과로 표현한 데모 화면.</figcaption>
-</figure>
-
 #### [The Context Budget Crisis: Why MCP Needs Server-Side Response Controls](https://mcpseoul2026.sched.com/event/2PYdA/the-context-budget-crisis-why-mcp-needs-server-side-response-controls-nimit-savant-gokul-k-s-devrev)
 
 <small>연사: Nimit Savant · Gokul K S (DevRev)</small>
@@ -125,6 +150,24 @@ API 기능을 그대로 나열하지 않고 에이전트의 의도와 작업 흐
 <small>연사: Dakshitha Ratnayake (WSO2)</small>
 
 API, LLM과 MCP 트래픽의 성격에 따라 서로 다른 위험과 정책을 관리할 통제 지점을 구분하는 틀을 설명했습니다.
+
+<div class="photo-pair">
+
+<figure>
+
+![첫날 저녁 하늘 아래 파르나스 건물](../../assets/posts/mcp-dev-summit-seoul-2026/parnas-evening.webp)
+
+<figcaption>첫날 세션을 마치고 나와서 본 파르나스.</figcaption>
+</figure>
+
+<figure>
+
+![행사장 주변 도심 건물과 푸른 하늘](../../assets/posts/mcp-dev-summit-seoul-2026/venue-neighborhood.webp)
+
+<figcaption>해가 지기 전의 행사장 주변 풍경.</figcaption>
+</figure>
+
+</div>
 
 ### 2일 차 — 8월 14일
 
@@ -164,13 +207,6 @@ MCP는 실시간 시스템에 접근하는 수단으로, Skill은 도구 사용 
 
 에이전트 설정을 코드처럼 버전 관리하고, 평가와 사람의 검토를 통과한 변경만 운영 환경에 반영한 사례가 인상적이었습니다.
 
-<figure>
-
-![에이전트 설정의 Pull Request에 시뮬레이션과 평가를 연결한 발표 슬라이드](../../assets/posts/mcp-dev-summit-seoul-2026/agent-evaluation.webp)
-
-<figcaption>Navtej Reddy(Observe.ai), Why We Made Our AI Agent Platform a Codebase Before Adding MCP. PR에서 시뮬레이션과 평가를 수행하는 흐름.</figcaption>
-</figure>
-
 #### [Closing the Context Gap: Making Your APIs Agent-Ready](https://mcpseoul2026.sched.com/event/2PYdw/closing-the-context-gap-making-your-apis-agent-ready-aanchal-mishra-postman-ali-mustafa-shaikh-pieces-ai)
 
 <small>연사: Aanchal Mishra (Postman) · Ali Mustufa Shaikh (Pieces AI)</small>
@@ -182,6 +218,13 @@ API를 자동으로 연결하는 것보다 에이전트가 입력, 단위, 승�
 <small>연사: Bhumika Satpathy (Google)</small>
 
 필요한 기능을 그때 찾아 실행하고 중간 데이터를 실행 환경 안에서 처리해, 도구 정보와 데이터의 컨텍스트 사용량을 줄이는 방식을 소개했습니다.
+
+<figure>
+
+![그랜드 볼룸 포이어에서 부스를 둘러보고 대화를 나누는 행사 참가자들](../../assets/posts/mcp-dev-summit-seoul-2026/networking.webp)
+
+<figcaption>둘째 날 마지막 세션 이후, 그랜드 볼룸 포이어의 네트워킹 현장.</figcaption>
+</figure>
 
 ## 발표 자료와 영상
 

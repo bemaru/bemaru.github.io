@@ -1038,6 +1038,23 @@ svg {
   line-height: 1.6;
 }
 
+.prose .photo-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 2rem 0;
+}
+
+.prose .photo-pair figure {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .prose .photo-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .prose blockquote {
   padding: 2px 0 2px 18px;
   border-left: 4px solid var(--accent);
