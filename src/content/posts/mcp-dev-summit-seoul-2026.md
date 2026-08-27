@@ -1,6 +1,6 @@
 ---
-title: "MCP Dev Summit Seoul 2026 후기: 연결 이후의 설계와 운영"
-description: "MCP Dev Summit Seoul 2026에서 들은 도구 설계, 실행 경계, Skills와 에이전트 평가 이야기. MCP를 어디에 쓰고 어떻게 운영할지 다시 생각해 본 참가 후기입니다."
+title: "MCP Dev Summit Seoul 2026 참가 후기"
+description: "이틀 동안 들은 MCP와 AI 에이전트 설계·운영 사례, 세션별 주요 내용과 현장 사진을 정리했습니다."
 publishedAt: 2026-08-27
 category: ai-engineering
 draft: true
@@ -12,90 +12,183 @@ tags:
   - conference
 ---
 
-8월 13일부터 14일까지 그랜드 인터컨티넨탈 서울 파르나스에서 열린 [MCP Dev Summit Seoul 2026](https://events.linuxfoundation.org/mcp-dev-summit-seoul/)에 다녀왔습니다. MCP 생태계와 AI 에이전트의 설계·운영 사례를 다룬 개발자 행사였습니다.
+지난 8월 13일(목)부터 14일(금)까지 서울에서 열린 [MCP Dev Summit Seoul 2026](https://events.linuxfoundation.org/mcp-dev-summit-seoul/)에 다녀왔습니다. MCP 생태계와 AI 에이전트의 설계·운영 사례를 다룬 행사로, 이틀 동안 들은 세션을 중심으로 행사에서 반복해서 나온 문제의식과 세션별 주요 내용을 정리했습니다.
 
-개인적으로는 에이전트를 개발하면서 고민했던 MCP의 적용 범위, 도구 설계, 기존 API를 MCP 도구로 전환하는 과정이 여러 발표의 주제와 맞닿아 있어 반가웠습니다. 비슷한 문제를 다른 팀은 어떻게 풀고 있는지 비교해 볼 수 있었습니다.
+2026년 8월 13–14일 · 그랜드 인터컨티넨탈 서울 파르나스
 
-제가 들은 세션에서는 연결을 만든 다음의 이야기가 많이 나왔습니다. 어떤 기능을 노출할지, 누가 실행할 수 있는지, 실패했을 때 어떻게 복구하고 변경 결과를 검증할지에 관한 내용입니다. 그중 개발하면서 다시 꺼내 보고 싶은 관점을 중심으로 정리했습니다.
+## 전체 소감
 
-## MCP가 필요한지부터 묻기
+개인적으로는 에이전트를 개발하며 고민했던 MCP의 적용 경계, 기능 범위, 기존 API를 MCP 도구로 전환하는 과정이 여러 발표의 주제와 맞닿아 있어 특히 와닿았습니다. 비슷한 문제 해결 과정을 다른 사례와 비교하면서 새롭게 살펴볼 관점도 얻었습니다.
 
-MCP 행사에서 기억에 남은 이야기 중 하나는 모든 기능을 MCP로 만들 필요는 없다는 것이었습니다.
+무엇보다 MCP 적용 자체가 목적은 아니며, 문제에 맞게 에이전트의 역할과 실행 구조를 어떻게 설계할지가 더 중요하다는 점을 다시 생각해 볼 수 있었습니다.
 
-Daniel Oh(Red Hat)의 [The 5 Wrong Reasons to Build an MCP Server (And What to Do Instead)](https://mcpseoul2026.sched.com/event/2Rfp5/the-5-wrong-reasons-to-build-an-mcp-server-and-what-to-do-instead-daniel-oh-red-hat)는 MCP의 이점과 구현·운영 비용을 함께 봐야 한다는 내용이었습니다. 단일 에이전트의 단순한 함수 호출이나 이미 잘 동작하는 백엔드 접근까지 새로 감쌀 이유가 있는지 먼저 묻습니다.
+## 서밋에서 반복해서 나온 세 가지 질문
 
-Junho Kong(SK On)의 [When Does an Agentic Workflow Need MCP?](https://mcpseoul2026.sched.com/event/2PZo6/when-does-an-agentic-workflow-need-mcp-matching-intelligence-and-interfaces-to-the-outcome-junho-kong-sk-on)도 비슷한 질문을 다른 각도에서 다뤘습니다. 원하는 결과와 사용 방식을 먼저 정하고, 그에 맞는 인터페이스를 고르자는 접근입니다.
+### 1. MCP가 정말 필요한 문제인가?
 
-두 발표를 듣고 제가 남긴 구분은 다음과 같습니다.
+단일 함수 호출처럼 단순한 작업이나 호출자와 절차가 정해진 작업에는 기존 API·CLI·템플릿·워크플로가 더 적합할 수 있다는 이야기가 여러 번 나왔습니다. MCP를 먼저 선택하기보다 여러 에이전트가 공통으로 찾아 반복해서 사용할 기능인지부터 확인하고, 상태·승인·권한 관리는 어떤 실행 구조에서 맡을지 살펴봐야 한다는 관점입니다.
 
-| 필요한 것 | 먼저 검토할 수단 |
-| --- | --- |
-| 코드를 작성하고 실행하며 아직 모르는 문제를 탐색하기 | 코딩 에이전트 |
-| 검증된 방법을 정해진 입력으로 반복하기 | 버전 관리되는 템플릿 |
-| 호출자와 작업 방식이 정해진 기능을 실행하기 | API·CLI |
-| 상태를 보존하며 중단·재개하고 사람의 승인을 기다리기 | 워크플로 엔진 |
-| 여러 AI 애플리케이션이 공통 기능을 발견하고 호출하기 | MCP |
+### 2. 도구와 컨텍스트를 어떻게 설계할 것인가?
 
-이 구분은 반드시 순서대로 밟아야 하는 단계는 아닙니다. 워크플로 엔진을 API나 MCP 뒤에 둘 수도 있고, 기존 API의 일부 기능만 MCP로 제공할 수도 있습니다. 상태나 승인 관리가 필요하다는 사실만으로 MCP가 필요한 것은 아니라는 점도 구분해 두려고 합니다.
+API 엔드포인트를 일대일로 노출하면 도구 선택이 어려워지고 불필요한 컨텍스트도 늘어납니다. 에이전트의 의도와 결과에 맞게 도구를 선별하고, 필요한 스키마와 필드만 제공하며, 입력·단위·승인 조건을 추측하지 않도록 계약을 명확히 해야 한다는 사례가 많았습니다.
 
-## 도구를 에이전트의 작업 흐름에 맞추기
+40개 도구를 14개로 줄인 발표도 같은 맥락이었습니다. 단순히 개수를 줄인 것이 아니라 객체와 엔드포인트 중심의 API를 에이전트의 의도와 작업 흐름에 맞게 다시 구성했다는 점이 핵심이었습니다.
 
-Nimit Savant와 Gokul K S(DevRev)의 [From 40 Tools To 14: A Practical Framework for MCP Tool Curation](https://mcpseoul2026.sched.com/event/2PYeE/from-40-tools-to-14-a-practical-framework-for-mcp-tool-curation-nimit-savant-gokul-k-s-devrev)는 제목부터 눈에 들어왔습니다.
+<figure>
 
-핵심은 도구 개수를 줄이는 과정에서 API의 객체·엔드포인트 중심 구조를 에이전트의 의도와 작업 흐름에 맞게 다시 구성했다는 점입니다. 비슷한 조회 도구를 계속 나열하면 에이전트는 어느 도구를 골라야 하는지 추측하고, 판단에 필요한 맥락을 얻기 위해 추가 호출을 반복하게 됩니다.
+![DevRev 발표의 Search → Context → Act 도구 설계 슬라이드](../../assets/posts/mcp-dev-summit-seoul-2026/tool-curation.webp)
 
-발표에서는 `Search → Context → Act`로 역할을 나눴습니다. 검색은 후보와 다음 판단에 필요한 단서를, 맥락 조회는 관련 정보까지 포함한 상황을, 실행은 원하는 결과에 맞춘 작업을 제공하는 식입니다. 도구 설명에도 무엇을 하는지만 적지 않고 언제 써야 하며 어떤 판단 근거를 얻을 수 있는지 담았습니다.
+<figcaption>Nimit Savant · Gokul K S(DevRev), From 40 Tools To 14. 에이전트의 작업 흐름에 맞춰 도구를 구성하는 설명.</figcaption>
+</figure>
 
-같은 연사들의 [The Context Budget Crisis: Why MCP Needs Server-Side Response Controls](https://mcpseoul2026.sched.com/event/2PYdA/the-context-budget-crisis-why-mcp-needs-server-side-response-controls-nimit-savant-gokul-k-s-devrev)는 응답 설계로 이어졌습니다. 지금 쓰지 않을 스키마를 모두 올리거나 불필요한 필드까지 반환하면, 정작 판단에 쓸 컨텍스트가 줄어듭니다. 필요한 스키마를 나중에 불러오고 서버에서 응답 필드와 집계 결과를 선별하는 접근을 소개했습니다.
+### 3. 연결한 이후를 어떻게 운영할 것인가?
 
-제게는 도구 목록과 응답을 함께 검토해야 한다는 점이 남았습니다. 도구를 합쳤더라도 응답이 지나치게 크거나 의미가 모호하면 문제는 남습니다. 14라는 개수 자체를 목표로 삼기보다는, 도구를 고르고 결과를 해석하는 과정에서 에이전트가 얼마나 추측해야 하는지 살펴보고 싶습니다.
+에이전트가 상황을 관찰하고 대응을 제안하더라도 실제 변경은 권한 검사를 거치고 사람의 승인을 받은 뒤 기존 실행 체계가 처리하도록 역할을 나누는 방식이 반복해서 소개됐습니다. 근거가 부족할 때는 추정하지 않고 판단을 유보하며, 도구를 검색·확인할 권한과 실제 대상에 실행할 권한도 구분해야 한다는 내용이 인상적이었습니다.
 
-## 판단을 유보할 수 있는 실행 구조
+에이전트를 여러 구성 요소가 각각 실패할 수 있는 분산 시스템으로 보고 기억과 실행 상태를 구분해야 한다는 발표도 있었습니다. 운영 단계에서는 레지스트리, 자격 증명, 게이트웨이, 감사, 트레이스와 재현 가능한 평가까지 함께 설계해야 한다는 메시지가 이어졌습니다.
 
-Sunyoung Park(KC-ML2)의 [Stop Wrapping APIs: Building Structured Execution Boundaries With MCP for Incident Triage](https://mcpseoul2026.sched.com/event/2PYeW/stop-wrapping-apis-building-structured-execution-boundaries-with-mcp-for-incident-triage-sunyoung-park-kc-ml2)는 필요한 근거를 모으고 정책을 확인한 뒤, 허용된 범위 안에서 결과를 내는 실행 경계를 다뤘습니다. 이 세션은 시작 직후부터 참석했고, 공개 발표 자료도 함께 확인했습니다.
+## 세션별 주요 내용
 
-특히 요청한 기간의 데이터가 부족할 때 `INDETERMINATE`, 즉 판단 불가를 반환한 데모가 기억에 남습니다. 근거가 없는 부분을 자연스러운 설명으로 채우지 않고, 판단할 수 없는 상태를 결과로 표현했습니다.
+### 1일 차 — 8월 13일
 
-Aram Andreasyan(Cerbos)의 [Authorization in MCP Systems: Getting It Right From the Start](https://mcpseoul2026.sched.com/event/2PYd1/authorization-in-mcp-systems-getting-it-right-from-the-start-aram-andreasyan-cerbos)에서는 도구를 발견할 권한과 실제로 호출할 권한을 나눠 봤습니다. 도구 이름만 허용해도 끝나는 것이 아니라, 호출 인자에 담긴 대상과 범위를 실행 시점에 확인해야 한다는 내용입니다. 이 세션은 종료 직전까지 부분 참석했습니다.
+#### Keynotes
 
-실행 이후의 상태도 별개의 문제였습니다. Nasiullha Chaudhari(YugabyteDB)의 [Stateful AI Agents: Building Consistent Systems with MCP and Distributed SQL](https://mcpseoul2026.sched.com/event/2TLPA/stateful-ai-agents-building-consistent-systems-with-mcp-and-distributed-sql-nasiullha-chaudhari-yugabytedb)는 타임아웃 뒤 재시도가 중복 실행을 만들 수 있다는 사례를 다뤘습니다. 응답을 못 받았다고 해서 작업이 실행되지 않았다고 단정할 수는 없습니다. 실행 의도와 결과를 보존하고, 재시도해도 같은 작업이 중복 반영되지 않도록 멱등성을 설계해야 합니다.
+<small>연사: Demetrios Brinkmann (Agentic AI Foundation) · Den Delimarsky (Anthropic) · Ana Jiménez Santamaría (Linux Foundation) · Jihye Kim (Naver Cloud Platform)</small>
 
-이 세션들을 함께 떠올리면, 에이전트가 좋은 답을 내는 것과 실제 시스템을 변경해도 되는 것은 따로 확인해야 할 문제였습니다. 근거의 충분함, 호출 권한, 승인 여부, 이전 실행 결과를 각각 확인할 책임이 필요하다고 느꼈습니다.
+MCP 생태계가 성장한 이후 필요한 레지스트리, 검색, 자격 증명, 가드레일과 감사 등의 운영 체계를 다뤘습니다.
 
-## Skills와 MCP를 함께 쓰는 기준
+#### [Stateful AI Agents: Building Consistent Systems with MCP and Distributed SQL](https://mcpseoul2026.sched.com/event/2TLPA/stateful-ai-agents-building-consistent-systems-with-mcp-and-distributed-sql-nasiullha-chaudhari-yugabytedb)
 
-Dale Seo(Apollo GraphQL)의 [Skills and MCP: Complementary, Not Competing](https://mcpseoul2026.sched.com/event/2PYdk/skills-and-mcp-complementary-not-competing-dale-seo-apollo-graphql)는 두 방식을 함께 활용하는 관점을 설명했습니다. 전반부에 참석했고, 이동 후 듣지 못한 내용은 공개 발표 자료로 보완했습니다.
+<small>연사: Nasiullha Chaudhari (YugabyteDB)</small>
 
-이 발표에서는 MCP를 실제 시스템의 기능과 데이터에 접근하는 수단으로, Skills를 그 도구를 올바르게 사용하는 절차와 전문 지식으로 구분했습니다. 실시간 상태나 인증이 필요한 작업은 MCP로 연결하고, 비교적 오래 유지되는 지식과 작업 규칙은 Skill로 제공하는 방식입니다.
+에이전트를 여러 구성 요소가 각각 실패할 수 있는 분산 시스템으로 보고, 기억과 실행 상태를 구분해 중복 실행을 막는 방법을 설명했습니다.
 
-공개 자료의 장애 회고 예시도 이 구분을 이해하는 데 도움이 됐습니다. 여러 서비스에서 현재 근거를 가져오는 기능과, 그 근거를 모아 대조하고 회고 문서를 작성하는 절차는 서로 다른 역할입니다. 어느 정보를 어디에 둘지 정할 때 정보의 변화 속도와 실행 위치를 함께 살펴볼 수 있겠다고 생각했습니다.
+#### [From Legacy To Agentic AI](https://mcpseoul2026.sched.com/event/2PYeB/from-legacy-to-agentic-ai-seoyul-yoon-aaif-community-seoul)
 
-## 에이전트의 변경도 리뷰 가능한 코드로
+<small>연사: Seoyul Yoon (AAIF Community Seoul)</small>
 
-Navtej Reddy(Observe.ai)의 [Why We Made Our AI Agent Platform a Codebase Before Adding MCP](https://mcpseoul2026.sched.com/event/2PYdn/why-we-made-our-ai-agent-platform-a-codebase-before-adding-mcp-navtej-reddy-observeai)는 에이전트 구성을 코드로 관리한 사례였습니다.
+기존 OpenAPI 명세를 활용해 MCP로 전환하는 사례와, 자동 변환 이후 노출 범위와 설명을 정제하는 과정을 소개했습니다.
 
-프롬프트와 도구, 대화 흐름을 버전 관리되는 파일로 두고, 에이전트가 만든 변경도 브랜치에서 작업한 뒤 시뮬레이션과 자동 평가를 거쳐 사람이 검토할 PR로 올리는 구조를 소개했습니다. 이렇게 하면 무엇을 바꿨는지 비교하고, 변경 이유를 남기며, 문제가 생겼을 때 되돌릴 수 있습니다.
+#### [From 40 Tools To 14: A Practical Framework for MCP Tool Curation](https://mcpseoul2026.sched.com/event/2PYeE/from-40-tools-to-14-a-practical-framework-for-mcp-tool-curation-nimit-savant-gokul-k-s-devrev)
 
-인상적이었던 점은 에이전트가 스스로 변경하고 검증하더라도 리뷰 가능한 형태로 결과를 남긴다는 것이었습니다. 프롬프트를 조금 고쳤다는 이유로 가볍게 볼 수는 없습니다. 도구 선택이나 실행 순서가 달라질 수 있는 만큼, 변경 전후를 비교할 시나리오와 회귀 검증이 필요하다는 생각이 들었습니다.
+<small>연사: Nimit Savant · Gokul K S (DevRev)</small>
 
-## 돌아와서 남긴 질문들
+API 기능을 그대로 나열하지 않고 에이전트의 의도와 작업 흐름에 맞게 도구를 줄이고 재구성하는 방법을 다뤘습니다.
 
-개인적으로는 MCP의 가능성과 함께 실제 운영의 한계, 선택 기준을 들을 수 있어서 좋았습니다. 에이전트를 개발하며 고민했던 문제를 여러 사례에 비춰 볼 수 있었고, MCP를 붙인 다음 무엇을 확인해야 하는지도 조금 더 구체적으로 정리됐습니다.
+#### [Who Watches the Watchmen? Safe AI-Agent Failover Via MCP and CRDs](https://mcpseoul2026.sched.com/event/2PYeZ/who-watches-the-watchmen-safe-ai-agent-failover-via-mcp-and-crds-phuong-bac-ta-research-center-for-distributed-cloud-and-networking-ssu-south-korea-vitumbiko-mafeni-cnlab-ssu-iistrc)
 
-다음에 비슷한 기능을 설계할 때는 이 세 가지를 먼저 확인해 보려고 합니다.
+<small>연사: Phuong Bac Ta (CNLab.ai) · Vitumbiko Mafeni (Research Center for Distributed Cloud and Networking)</small>
 
-1. **이 기능을 누가, 어떤 방식으로 반복해서 사용할 것인가?** 기존 API나 CLI로 충분한지, 여러 에이전트가 공통으로 발견하고 호출할 인터페이스가 필요한지 확인합니다.
-2. **에이전트가 추측해야 하는 부분은 어디인가?** 도구 선택, 입력의 의미, 응답 해석과 실패 처리에서 계약이 모호한 곳을 찾습니다.
-3. **실행과 변경을 어떻게 검증할 것인가?** 권한과 승인, 중복 실행 방지, 실행 기록, 평가와 리뷰까지 함께 생각합니다.
+에이전트는 상황을 관찰하고 대응을 제안하며, 실제 변경은 사람의 승인과 기존 실행 체계를 거치도록 역할을 나눈 사례가 인상적이었습니다.
 
-이번 후기는 참석한 세션과 공개 자료에서 얻은 관점을 정리한 것입니다. 각 발표의 방법이 제 환경에서도 같은 효과를 낼지는 별도로 검증해야 합니다. 그래도 다음 설계에서 무엇을 질문하고 확인할지 기준을 얻었다는 점에서 의미 있는 이틀이었습니다.
+#### [Authorization in MCP Systems: Getting It Right From the Start](https://mcpseoul2026.sched.com/event/2PYd1/authorization-in-mcp-systems-getting-it-right-from-the-start-aram-andreasyan-cerbos)
+
+<small>연사: Aram Andreasyan (Cerbos) · 종료 직전까지 참석</small>
+
+신원 확인과 권한 부여를 구분하고, 도구의 탐색 범위와 실제 대상에 대한 호출 권한을 각각 통제하는 방법을 다뤘습니다.
+
+#### [AAIF Ambassador AMA: Building the Agentic Future Through Community Contribution](https://mcpseoul2026.sched.com/event/2QScw/aaif-ambassador-ama-building-the-agentic-future-through-community-contribution-hoon-jo-megazone-daniel-oh-red-hat-ana-jimenenez-santamaria-linux-foundation-kevin-dubious-ibm-junghwan-park-pytorchkr)
+
+<small>패널: Hoon Jo (Megazone) · Daniel Oh (Red Hat) · Ana Jiménez Santamaría (Linux Foundation) · Kevin Dubois (IBM) · Junghwan Park (PyTorchKR) · 마지막 부분만 참석</small>
+
+관심 있는 AAIF 프로젝트와 워킹 그룹을 찾고, 제안과 논의부터 직접 기여까지 커뮤니티에 참여하는 방법을 소개했습니다.
+
+#### [Stop Wrapping APIs: Building Structured Execution Boundaries With MCP for Incident Triage](https://mcpseoul2026.sched.com/event/2PYeW/stop-wrapping-apis-building-structured-execution-boundaries-with-mcp-for-incident-triage-sunyoung-park-kc-ml2)
+
+<small>연사: Sunyoung Park (KC-ML2) · 시작 직후부터 참석, 공개 발표 자료 함께 참고</small>
+
+근거가 부족할 때 추정하지 않고 판단을 유보하며, 허용된 범위 안에서만 결과를 내도록 에이전트의 실행 경계를 설계하는 방법을 다뤘습니다.
+
+데모에서는 근거를 확인할 수 없는 요청에 `INDETERMINATE`(판단 불가)를 반환했습니다.
+
+<figure>
+
+![근거를 확인할 수 없어 INDETERMINATE를 반환한 발표 데모](../../assets/posts/mcp-dev-summit-seoul-2026/indeterminate-demo.webp)
+
+<figcaption>Sunyoung Park(KC-ML2), Stop Wrapping APIs. 판단 불가를 결과로 표현한 데모 화면.</figcaption>
+</figure>
+
+#### [The Context Budget Crisis: Why MCP Needs Server-Side Response Controls](https://mcpseoul2026.sched.com/event/2PYdA/the-context-budget-crisis-why-mcp-needs-server-side-response-controls-nimit-savant-gokul-k-s-devrev)
+
+<small>연사: Nimit Savant · Gokul K S (DevRev)</small>
+
+도구와 응답을 한꺼번에 제공해 컨텍스트를 낭비하지 않도록, 서버가 필요한 정보만 선별해 제공하는 방식을 다뤘습니다.
+
+#### [From APIs To Agentic Toolkits: Designing MCP Flavors and a Public MCP Gateway at Scale](https://mcpseoul2026.sched.com/event/2PYdM/from-apis-to-agentic-toolkits-designing-mcp-flavors-and-a-public-mcp-gateway-at-scale-faizan-akhtar-react-india)
+
+<small>연사: Faizan Akhtar (React India)</small>
+
+외부 진입점과 내부 기능을 계층으로 나누고, 각 계층이 권한과 품질 기준을 유지하는 공개 MCP 운영 구조를 소개했습니다.
+
+#### [Three Gateways for the Agentic Era: An Architectural Framework for Governing AI Agent Traffic](https://mcpseoul2026.sched.com/event/2PYdS/three-gateways-for-the-agentic-era-an-architectural-framework-for-governing-ai-agent-traffic-dakshitha-ratnayake-ws02)
+
+<small>연사: Dakshitha Ratnayake (WSO2)</small>
+
+API, LLM과 MCP 트래픽의 성격에 따라 서로 다른 위험과 정책을 관리할 통제 지점을 구분하는 틀을 설명했습니다.
+
+### 2일 차 — 8월 14일
+
+#### Day 2 Keynotes
+
+<small>연사: HyunSoo Kim (Workato) · Woo Hyung Choi (AWS)</small>
+
+기업 환경의 MCP를 중앙에서 운영하고, 신원·권한·거버넌스·관측 가능성을 상호운용성의 기반으로 삼는 관점을 다뤘습니다.
+
+#### [The 5 Wrong Reasons to Build an MCP Server (And What to Do Instead)](https://mcpseoul2026.sched.com/event/2Rfp5/the-5-wrong-reasons-to-build-an-mcp-server-and-what-to-do-instead-daniel-oh-red-hat)
+
+<small>연사: Daniel Oh (Red Hat)</small>
+
+단순한 관심이나 막연한 보안 기대보다, 분산된 환경과 공통 기능 탐색 등 실제 필요 조건을 먼저 확인해야 한다는 메시지였습니다.
+
+#### [When Does an Agentic Workflow Need MCP?](https://mcpseoul2026.sched.com/event/2PZo6/when-does-an-agentic-workflow-need-mcp-matching-intelligence-and-interfaces-to-the-outcome-junho-kong-sk-on)
+
+<small>연사: Junho Kong (SK On)</small>
+
+문제의 불확실성, 반복 사용 여부, 호출자와 승인 절차에 따라 코딩 에이전트, 템플릿, API, 워크플로와 MCP를 선택하는 기준을 다뤘습니다.
+
+#### [Skills and MCP: Complementary, Not Competing](https://mcpseoul2026.sched.com/event/2PYdk/skills-and-mcp-complementary-not-competing-dale-seo-apollo-graphql)
+
+<small>연사: Dale Seo (Apollo GraphQL) · 전반부 참석, 이후 내용은 공개 발표 자료로 보완</small>
+
+MCP는 실시간 시스템에 접근하는 수단으로, Skill은 도구 사용 절차와 전문 지식으로 구분하고 두 방식을 함께 활용하는 접근을 설명했습니다.
+
+#### [Hardening MCP Integrations Against Tool Poisoning](https://mcpseoul2026.sched.com/event/2PYdh/hardening-mcp-integrations-against-tool-poisoning-arshardh-ifthikar-wso2)
+
+<small>연사: Arshardh Ifthikar (WSO2) · 후반부 참석</small>
+
+도구의 설명과 결과뿐 아니라 여러 도구를 조합했을 때 생길 수 있는 위험까지 탐색과 실행 단계에서 점검하는 방식을 다뤘습니다.
+
+#### [Why We Made Our AI Agent Platform a Codebase Before Adding MCP](https://mcpseoul2026.sched.com/event/2PYdn/why-we-made-our-ai-agent-platform-a-codebase-before-adding-mcp-navtej-reddy-observeai)
+
+<small>연사: Navtej Reddy (Observe.ai)</small>
+
+에이전트 설정을 코드처럼 버전 관리하고, 평가와 사람의 검토를 통과한 변경만 운영 환경에 반영한 사례가 인상적이었습니다.
+
+<figure>
+
+![에이전트 설정의 Pull Request에 시뮬레이션과 평가를 연결한 발표 슬라이드](../../assets/posts/mcp-dev-summit-seoul-2026/agent-evaluation.webp)
+
+<figcaption>Navtej Reddy(Observe.ai), Why We Made Our AI Agent Platform a Codebase Before Adding MCP. PR에서 시뮬레이션과 평가를 수행하는 흐름.</figcaption>
+</figure>
+
+#### [Closing the Context Gap: Making Your APIs Agent-Ready](https://mcpseoul2026.sched.com/event/2PYdw/closing-the-context-gap-making-your-apis-agent-ready-aanchal-mishra-postman-ali-mustafa-shaikh-pieces-ai)
+
+<small>연사: Aanchal Mishra (Postman) · Ali Mustufa Shaikh (Pieces AI)</small>
+
+API를 자동으로 연결하는 것보다 에이전트가 입력, 단위, 승인 조건과 결과를 추측하지 않도록 계약을 명확히 만드는 과정을 다뤘습니다.
+
+#### [Managing Token Usage in MCP Servers Using Code Mode](https://mcpseoul2026.sched.com/event/2PYe5/managing-token-usage-in-mcp-servers-using-code-mode-bhumika-satpathy-google)
+
+<small>연사: Bhumika Satpathy (Google)</small>
+
+필요한 기능을 그때 찾아 실행하고 중간 데이터를 실행 환경 안에서 처리해, 도구 정보와 데이터의 컨텍스트 사용량을 줄이는 방식을 소개했습니다.
 
 ## 발표 자료와 영상
 
-전체 프로그램과 공개 슬라이드는 [공식 일정표](https://mcpseoul2026.sched.com/)에서 확인할 수 있습니다. [행사 공식 페이지](https://events.linuxfoundation.org/mcp-dev-summit-seoul/)에는 다음 영상 링크도 안내되어 있습니다.
+전체 프로그램과 공개 발표 자료는 [공식 일정표](https://mcpseoul2026.sched.com/)에서 확인할 수 있습니다. [공식 행사 페이지](https://events.linuxfoundation.org/mcp-dev-summit-seoul/)에서 안내하는 영상 링크도 함께 남깁니다.
 
-- [Day 1 라이브스트림](https://www.youtube.com/watch?v=DMFDb1GCjKY)
-- [Day 2 라이브스트림](https://www.youtube.com/watch?v=VSLSiW5JPAs)
+- [Day 1 라이브스트림 다시 보기](https://www.youtube.com/watch?v=DMFDb1GCjKY)
+- [Day 2 라이브스트림 다시 보기](https://www.youtube.com/watch?v=VSLSiW5JPAs)
 - [Agentic AI Foundation YouTube 채널](https://www.youtube.com/@AgenticAI-Foundation)
 
-슬라이드와 녹화 공개 여부는 세션마다 다를 수 있습니다. 관심 있는 발표의 상세 페이지와 채널을 함께 살펴보면 좋겠습니다.
+<small>사진은 현장에서 직접 촬영했습니다. 사진 속 발표 자료의 출처는 각 세션의 발표자입니다.</small>

@@ -1015,6 +1015,28 @@ svg {
   font-weight: 800;
 }
 
+.prose figure {
+  margin: 2rem 0;
+}
+
+.prose figure p {
+  margin: 0;
+}
+
+.prose figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.prose figcaption {
+  margin-top: 0.65rem;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
 .prose blockquote {
   padding: 2px 0 2px 18px;
   border-left: 4px solid var(--accent);
