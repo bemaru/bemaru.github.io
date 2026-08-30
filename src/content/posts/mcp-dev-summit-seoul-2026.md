@@ -3,7 +3,7 @@ title: "MCP Dev Summit Seoul 2026 참가 후기"
 description: "이틀 동안 들은 MCP와 AI 에이전트 설계·운영 사례, 세션별 주요 내용과 현장 사진을 정리했습니다."
 publishedAt: 2026-08-21
 category: ai-engineering
-draft: true
+draft: false
 featured: false
 tags:
   - mcp

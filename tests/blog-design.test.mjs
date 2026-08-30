@@ -45,7 +45,7 @@ test('approved copy and summit evidence remain intact', () => {
   assert.match(about, /개발자 bemaru입니다/);
   assert.match(about, /보안 제품의 백엔드와 AI 에이전트를 개발하고 있습니다/);
   assert.match(post, /publishedAt: 2026-08-21/);
-  assert.match(post, /draft: true/);
+  assert.match(post, /draft: false/);
   assert.equal((post.match(/^!\[/gm) ?? []).length, 8);
   assert.equal(existsSync(new URL('../src/content/posts/restarting-developer-blog.md', import.meta.url)), false);
   assert.equal(existsSync(new URL('../src/content/projects/developer-blog.md', import.meta.url)), false);
