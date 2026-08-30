@@ -3,32 +3,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { GITHUB_URL } from '../consts';
 ---
 
-<BaseLayout title="About" description="bemaru와 이 개발자 블로그에 대한 소개입니다.">
+<BaseLayout title="소개" description="개발자 bemaru의 소개입니다.">
   <section class="page-header shell narrow">
-    <p class="eyebrow">About</p>
-    <h1>복잡한 문제를 구조화하고,<br />운영 가능한 형태로 만드는 개발자.</h1>
-  </section>
-
-  <section class="section shell narrow prose about-copy">
+    <h1>소개</h1>
     <p>
-      백엔드와 보안 제품 개발 경험을 바탕으로 AI Agent Engineering 역량을 확장하고 있습니다.
-      이 블로그에는 실무에서 부딪힌 문제와 기술을 선택한 이유, 검증 과정, 운영 단계에서 드러난
-      트레이드오프를 기록합니다.
+      개발자 bemaru입니다.<br />
+      보안 제품의 백엔드와 AI 에이전트를 개발하고 있습니다.
     </p>
-
-    <h2>기록 원칙</h2>
-    <ul>
-      <li>결과보다 문제와 판단의 맥락을 남깁니다.</li>
-      <li>재현 가능한 코드와 검증 근거를 우선합니다.</li>
-      <li>업무 기밀과 보안 경계를 지키며 공개 가능한 수준으로 추상화합니다.</li>
-      <li>오래된 글은 최초 작성일과 수정일을 분명하게 표시합니다.</li>
-    </ul>
-
-    <h2>현재 관심 분야</h2>
-    <p>AI Agent, MCP, 평가와 관측성, RAG, OpenSearch, Python, Go, EDR 및 탐지 엔지니어링.</p>
-
-    <p>
-      <a class="button secondary" href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub 보기</a>
-    </p>
+    <p><a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a></p>
   </section>
 </BaseLayout>

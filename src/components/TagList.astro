@@ -1,18 +1,23 @@
 ---
-import { tagToSlug } from '../utils/tags';
+import { getSitePosts } from '../utils/content';
+import { collectTags, tagToSlug } from '../utils/tags';
 
 interface Props {
   tags: string[];
-  linked?: boolean;
 }
 
-const { tags, linked = true } = Astro.props;
+const { tags } = Astro.props;
+const linkedTags = new Set(collectTags(await getSitePosts()).map((tag) => tag.slug));
 ---
 
 <ul class="tag-list" aria-label="태그">
   {tags.map((tag) => (
     <li>
-      {linked ? <a href={`/tags/${tagToSlug(tag)}/`}>#{tag}</a> : <span>#{tag}</span>}
+      {linkedTags.has(tagToSlug(tag)) ? (
+        <a class="tag-link" href={`/tags/${tagToSlug(tag)}/`}>#{tag}</a>
+      ) : (
+        <span class="tag-link">#{tag}</span>
+      )}
     </li>
   ))}
 </ul>

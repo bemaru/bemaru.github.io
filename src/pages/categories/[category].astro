@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import PostCard from '../../components/PostCard.astro';
+import { CATEGORIES, type CategoryDefinition } from '../../consts';
+import { getPostsByCategory } from '../../utils/categories';
+import { getSitePosts, type Post } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const posts = await getSitePosts();
+
+  return CATEGORIES.map((category) => ({
+    category,
+    posts: getPostsByCategory(posts, category.slug),
+  }))
+    .filter(({ posts }) => posts.length > 0)
+    .map(({ category, posts }) => ({
+      params: { category: category.slug },
+      props: { category, posts },
+    }));
+}
+
+interface Props {
+  category: CategoryDefinition;
+  posts: Post[];
+}
+
+const { category, posts } = Astro.props;
+---
+
+<BaseLayout title={category.name} description={category.description}>
+  <section class="page-header shell">
+    <p class="page-eyebrow">Category</p>
+    <h1>{category.name}</h1>
+    <p>{category.description}</p>
+    <span class="page-count">{posts.length}개의 글</span>
+  </section>
+
+  <section class="section shell">
+    {posts.length > 0 ? (
+      <div class="post-list">
+        {posts.map((post) => <PostCard post={post} headingLevel={2} />)}
+      </div>
+    ) : (
+      <EmptyState title="글이 없습니다." description="이 카테고리의 글을 준비 중입니다." />
+    )}
+  </section>
+</BaseLayout>

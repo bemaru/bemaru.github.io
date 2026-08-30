@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="검색"
+  description="제목, 설명, 태그, 카테고리와 시리즈에서 기술 글을 검색합니다."
+  noindex
+>
+  <section class="page-header shell narrow search-page-header">
+    <h1>검색</h1>
+
+    <form id="search-form" class="search-form" role="search">
+      <label class="sr-only" for="search-query">기술 글 검색</label>
+      <input
+        id="search-query"
+        class="search-input"
+        type="search"
+        name="q"
+        placeholder="검색어 입력"
+        autocomplete="off"
+        autofocus
+      />
+      <button class="search-button" type="submit">검색</button>
+    </form>
+  </section>
+
+  <section id="search-output" class="section shell narrow" hidden>
+    <p id="search-summary" class="search-summary" aria-live="polite"></p>
+    <div id="search-results" class="search-results"></div>
+  </section>
+
+  <script>
+    interface SearchItem {
+      title: string;
+      description: string;
+      url: string;
+      publishedAt: string;
+      category: string;
+      categorySlug: string;
+      series: string;
+      tags: string[];
+    }
+
+    interface SearchMatch {
+      item: SearchItem;
+      score: number;
+    }
+
+    const form = document.querySelector('#search-form');
+    const input = document.querySelector('#search-query');
+    const output = document.querySelector('#search-output');
+    const summary = document.querySelector('#search-summary');
+    const results = document.querySelector('#search-results');
+
+    if (
+      form instanceof HTMLFormElement &&
+      input instanceof HTMLInputElement &&
+      output instanceof HTMLElement &&
+      summary instanceof HTMLElement &&
+      results instanceof HTMLElement
+    ) {
+      const normalize = (value: string): string =>
+        value.normalize('NFKC').toLocaleLowerCase('ko-KR').trim();
+
+      const createResult = (item: SearchItem): HTMLElement => {
+        const article = document.createElement('article');
+        article.className = 'search-result-card';
+
+        const meta = document.createElement('p');
+        meta.className = 'search-result-meta';
+        const date = new Intl.DateTimeFormat('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          timeZone: 'Asia/Seoul',
+        }).format(new Date(item.publishedAt));
+        meta.textContent = `${item.category} · ${date}`;
+
+        const title = document.createElement('h2');
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.textContent = item.title;
+        title.append(link);
+
+        const description = document.createElement('p');
+        description.textContent = item.description;
+
+        const tags = document.createElement('p');
+        tags.className = 'search-result-tags';
+        tags.textContent = item.tags.map((tag) => `#${tag}`).join(' ');
+
+        article.append(meta, title, description, tags);
+        return article;
+      };
+
+      const indexPromise: Promise<SearchItem[]> = fetch('/search-index.json').then(
+        (response) => {
+          if (!response.ok) throw new Error('검색 색인을 불러오지 못했습니다.');
+          return response.json() as Promise<SearchItem[]>;
+        },
+      );
+
+      const runSearch = async (rawQuery: string): Promise<void> => {
+        const query = normalize(rawQuery);
+        results.replaceChildren();
+        output.hidden = !query;
+
+        if (!query) {
+          summary.textContent = '';
+          return;
+        }
+
+        summary.textContent = '검색 중입니다.';
+
+        try {
+          const items = await indexPromise;
+          const terms = query.split(/\s+/).filter(Boolean);
+          const matches = items
+            .map((item): SearchMatch | null => {
+              const title = normalize(item.title);
+              const description = normalize(item.description);
+              const category = normalize(item.category);
+              const series = normalize(item.series);
+              const tags = item.tags.map((tag) => normalize(tag));
+              const haystack = [title, description, category, series, ...tags].join(' ');
+
+              if (!terms.every((term) => haystack.includes(term))) {
+                return null;
+              }
+
+              let score = 0;
+              for (const term of terms) {
+                if (title === term) score += 100;
+                else if (title.startsWith(term)) score += 60;
+                else if (title.includes(term)) score += 40;
+                if (tags.some((tag) => tag === term)) score += 30;
+                if (category.includes(term) || series.includes(term)) score += 20;
+                if (description.includes(term)) score += 10;
+              }
+
+              return { item, score };
+            })
+            .filter((match): match is SearchMatch => match !== null)
+            .sort(
+              (a, b) =>
+                b.score - a.score ||
+                new Date(b.item.publishedAt).getTime() -
+                  new Date(a.item.publishedAt).getTime(),
+            );
+
+          summary.textContent = `${matches.length}개의 검색 결과`;
+          for (const match of matches) {
+            results.append(createResult(match.item));
+          }
+
+          if (matches.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'search-empty';
+            empty.textContent = '일치하는 글이 없습니다. 다른 검색어를 사용해 보세요.';
+            results.append(empty);
+          }
+        } catch (error) {
+          summary.textContent =
+            error instanceof Error ? error.message : '검색 중 오류가 발생했습니다.';
+        }
+      };
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const query = input.value.trim();
+        const url = new URL(window.location.href);
+        query ? url.searchParams.set('q', query) : url.searchParams.delete('q');
+        history.replaceState(null, '', url);
+        void runSearch(query);
+      });
+
+      const initialQuery = new URLSearchParams(window.location.search).get('q') ?? '';
+      input.value = initialQuery;
+      void runSearch(initialQuery);
+    }
+  </script>
+</BaseLayout>

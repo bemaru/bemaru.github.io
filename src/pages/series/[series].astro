@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getSitePosts, type Post } from '../../utils/content';
+import { collectSeries, type SeriesGroup } from '../../utils/series';
+
+export async function getStaticPaths() {
+  const groups = collectSeries(await getSitePosts());
+  return groups.map((group) => ({
+    params: { series: group.slug },
+    props: { group },
+  }));
+}
+
+interface Props {
+  group: SeriesGroup;
+}
+
+const { group } = Astro.props;
+const posts: Post[] = group.posts;
+---
+
+<BaseLayout
+  title={group.name}
+  description={`${group.name} 시리즈의 글을 순서대로 모았습니다.`}
+>
+  <section class="page-header shell">
+    <p class="page-eyebrow">Series</p>
+    <h1>{group.name}</h1>
+    <p>총 {posts.length}개의 글을 순서대로 정리했습니다.</p>
+  </section>
+
+  <section class="section shell">
+    <ol class="series-timeline">
+      {posts.map((post) => (
+        <li>
+          <span class="series-order">{post.data.series?.order}</span>
+          <PostCard post={post} headingLevel={2} />
+        </li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>

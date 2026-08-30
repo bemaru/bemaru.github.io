@@ -8,6 +8,7 @@ const { title, description } = Astro.props;
 ---
 
 <div class="empty-state">
-  <h3>{title}</h3>
+  <p class="empty-state-title">{title}</p>
   <p>{description}</p>
+  <slot />
 </div>

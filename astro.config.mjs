@@ -8,7 +8,12 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   compressHTML: true,
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) =>
+        !page.endsWith('/search/') && !page.endsWith('/404.html'),
+    }),
+  ],
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
