@@ -6,9 +6,11 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="shell footer-inner">
-    <p>© {year} bemaru</p>
-    <nav aria-label="보조 메뉴">
+    <p class="footer-copy">© {year} bemaru</p>
+    <nav class="footer-links" aria-label="보조 메뉴">
+      <a href="/archive/">보관함</a>
       <a href="/rss.xml">RSS</a>
+      <a href="/privacy/">개인정보</a>
       <a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a>
     </nav>
   </div>

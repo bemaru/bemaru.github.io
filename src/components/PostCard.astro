@@ -1,21 +1,28 @@
 ---
 import type { Post } from '../utils/content';
 import FormattedDate from './FormattedDate.astro';
-import TagList from './TagList.astro';
 
 interface Props {
   post: Post;
+  headingLevel?: 2 | 3;
 }
 
-const { post } = Astro.props;
+const { post, headingLevel = 2 } = Astro.props;
 ---
 
-<article class="content-card">
-  <div class="card-meta">
+<article class="post-card">
+  <div class="post-card-meta">
     <FormattedDate date={post.data.publishedAt} />
-    {post.data.draft && <span class="status-badge">Draft</span>}
   </div>
-  <h3><a href={`/writing/${post.id}/`}>{post.data.title}</a></h3>
-  <p>{post.data.description}</p>
-  {post.data.tags.length > 0 && <TagList tags={post.data.tags} />}
+
+  {headingLevel === 2 ? (
+    <h2 class="post-card-title">
+      <a href={`/writing/${post.id}/`}>{post.data.title}</a>
+    </h2>
+  ) : (
+    <h3 class="post-card-title">
+      <a href={`/writing/${post.id}/`}>{post.data.title}</a>
+    </h3>
+  )}
+  <p class="post-card-description">{post.data.description}</p>
 </article>

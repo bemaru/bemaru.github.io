@@ -1,0 +1,31 @@
+---
+interface Props {
+  compact?: boolean;
+  value?: string;
+  autofocus?: boolean;
+}
+
+const { compact = false, value = '', autofocus = false } = Astro.props;
+---
+
+<form
+  class:list={['search-form', compact && 'search-form-compact']}
+  action="/search/"
+  method="get"
+  role="search"
+>
+  <label class="sr-only" for={compact ? 'site-search-compact' : 'site-search'}>
+    기술 글 검색
+  </label>
+  <input
+    id={compact ? 'site-search-compact' : 'site-search'}
+    class="search-input"
+    type="search"
+    name="q"
+    value={value}
+    placeholder="검색어 입력"
+    autocomplete="off"
+    autofocus={autofocus}
+  />
+  <button class="search-button" type="submit">검색</button>
+</form>
