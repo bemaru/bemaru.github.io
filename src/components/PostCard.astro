@@ -1,26 +1,18 @@
 ---
 import type { Post } from '../utils/content';
-import { getCategory } from '../utils/categories';
 import FormattedDate from './FormattedDate.astro';
-import TagList from './TagList.astro';
 
 interface Props {
   post: Post;
   headingLevel?: 2 | 3;
 }
 
-const { post, headingLevel = 3 } = Astro.props;
-const category = getCategory(post.data.category);
+const { post, headingLevel = 2 } = Astro.props;
 ---
 
 <article class="post-card">
   <div class="post-card-meta">
-    <a class="category-label" href={`/categories/${category.slug}/`}>
-      {category.name}
-    </a>
-    <span aria-hidden="true">·</span>
     <FormattedDate date={post.data.publishedAt} />
-    {post.data.draft && <span class="status-badge">Draft</span>}
   </div>
 
   {headingLevel === 2 ? (
@@ -33,13 +25,4 @@ const category = getCategory(post.data.category);
     </h3>
   )}
   <p class="post-card-description">{post.data.description}</p>
-
-  {post.data.series && (
-    <p class="post-card-series">
-      시리즈 <a href={`/series/${post.data.series.slug}/`}>{post.data.series.name}</a>
-      <span>#{post.data.series.order}</span>
-    </p>
-  )}
-
-  {post.data.tags.length > 0 && <TagList tags={post.data.tags.slice(0, 4)} />}
 </article>

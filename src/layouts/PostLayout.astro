@@ -124,6 +124,21 @@ const breadcrumbData = {
 
     <div class:list={['article-body-grid', tocHeadings.length > 1 && 'has-toc']}>
       <div class="article-main">
+        {tocHeadings.length > 1 && (
+          <details class="mobile-toc">
+            <summary>목차</summary>
+            <nav class="toc" aria-label="모바일 목차">
+              <ol>
+                {tocHeadings.map((heading) => (
+                  <li class:list={{ 'toc-depth-3': heading.depth === 3 }}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </details>
+        )}
+
         {post.data.series && seriesPosts.length > 1 && (
           <aside class="series-panel" aria-label="시리즈 글 목록">
             <p class="series-panel-title">{post.data.series.name}</p>
@@ -143,22 +158,24 @@ const breadcrumbData = {
           <slot />
         </div>
 
-        <nav class="adjacent-posts" aria-label="이전 및 다음 글">
-          {newerPost ? (
-            <a class="adjacent-card" href={`/writing/${newerPost.id}/`}>
-              <span>새로운 글</span>
-              <strong>{newerPost.data.title}</strong>
-            </a>
-          ) : (
-            <span></span>
-          )}
-          {olderPost && (
-            <a class="adjacent-card adjacent-card-next" href={`/writing/${olderPost.id}/`}>
-              <span>이전 글</span>
-              <strong>{olderPost.data.title}</strong>
-            </a>
-          )}
-        </nav>
+        {(newerPost || olderPost) && (
+          <nav class="adjacent-posts" aria-label="이전 및 다음 글">
+            {newerPost ? (
+              <a class="adjacent-card" href={`/writing/${newerPost.id}/`}>
+                <span>새로운 글</span>
+                <strong>{newerPost.data.title}</strong>
+              </a>
+            ) : (
+              <span></span>
+            )}
+            {olderPost && (
+              <a class="adjacent-card adjacent-card-next" href={`/writing/${olderPost.id}/`}>
+                <span>이전 글</span>
+                <strong>{olderPost.data.title}</strong>
+              </a>
+            )}
+          </nav>
+        )}
 
         {relatedPosts.length > 0 && (
           <section class="related-section">

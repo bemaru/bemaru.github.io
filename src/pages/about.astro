@@ -3,47 +3,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { GITHUB_URL } from '../consts';
 ---
 
-<BaseLayout
-  title="소개"
-  description="백엔드와 보안 제품 개발 경험을 바탕으로 AI Agent Engineering을 확장하는 개발자 bemaru의 소개입니다."
->
+<BaseLayout title="소개" description="개발자 bemaru의 소개입니다.">
   <section class="page-header shell narrow">
-    <p class="page-eyebrow">About</p>
-    <h1>문제를 구조화하고,<br />운영 가능한 형태로 만드는 개발자.</h1>
+    <h1>소개</h1>
     <p>
-      백엔드와 보안 제품 개발 경험을 바탕으로 AI Agent Engineering을 확장하고 있습니다.
+      개발자 bemaru입니다.<br />
+      보안 제품의 백엔드와 AI 에이전트를 개발하고 있습니다.
     </p>
-  </section>
-
-  <section class="section shell narrow about-layout">
-    <div class="prose">
-      <h2>이 블로그에서 다루는 것</h2>
-      <p>
-        AI Agent, MCP, 평가와 관측성, RAG, OpenSearch, Python, Go, EDR와 탐지
-        엔지니어링을 다룹니다. 단순한 기능 소개보다 실제로 어떤 문제를 해결했고 왜
-        그 선택을 했는지 기록합니다.
-      </p>
-
-      <h2>기록 원칙</h2>
-      <ul>
-        <li>문제와 제약 조건을 먼저 설명합니다.</li>
-        <li>직접 실행하거나 검증한 근거를 구분합니다.</li>
-        <li>대안과 트레이드오프를 함께 남깁니다.</li>
-        <li>업무 기밀과 보안 경계를 지키며 공개 가능한 수준으로 일반화합니다.</li>
-        <li>내용을 실질적으로 다시 검증했을 때만 수정일을 갱신합니다.</li>
-      </ul>
-
-      <h2>콘텐츠 운영</h2>
-      <p>
-        비공개 원본 메모와 공개 블로그를 분리합니다. 이 저장소의 초안도 GitHub에서는
-        공개되므로, 외부에 공개 가능한 내용만 반영합니다.
-      </p>
-
-      <p>
-        <a class="button-link" href={GITHUB_URL} target="_blank" rel="noreferrer">
-          GitHub에서 보기
-        </a>
-      </p>
-    </div>
+    <p><a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a></p>
   </section>
 </BaseLayout>

@@ -1,17 +1,12 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Post = CollectionEntry<'posts'>;
-export type Project = CollectionEntry<'projects'>;
 
 const includeDrafts =
   import.meta.env.DEV || import.meta.env.INCLUDE_DRAFTS === 'true';
 
 export function isPublishedPost(post: Post, now = new Date()): boolean {
   return !post.data.draft && post.data.publishedAt <= now;
-}
-
-export function isPublishedProject(project: Project): boolean {
-  return !project.data.draft;
 }
 
 function sortPosts(posts: Post[]): Post[] {
@@ -30,20 +25,6 @@ export async function getSitePosts(): Promise<Post[]> {
   return sortPosts(
     includeDrafts ? posts : posts.filter((post) => isPublishedPost(post)),
   );
-}
-
-export async function getSiteProjects(): Promise<Project[]> {
-  const projects = await getCollection('projects');
-  const visible = includeDrafts
-    ? projects
-    : projects.filter((project) => isPublishedProject(project));
-
-  return visible.sort((a, b) => {
-    if (a.data.featured !== b.data.featured) {
-      return a.data.featured ? -1 : 1;
-    }
-    return a.data.title.localeCompare(b.data.title, 'ko-KR');
-  });
 }
 
 export function getRelatedPosts(

@@ -12,7 +12,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check",
-    "validate": "npm run check && npm run build",
+    "test:design": "node --test tests/blog-design.test.mjs",
+    "validate": "npm run check && npm run build && npm run test:design",
     "preview": "astro preview",
     "astro": "astro"
   },

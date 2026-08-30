@@ -1,10 +1,10 @@
 {
-  "name": "bemaru 기술 블로그",
+  "name": "bemaru",
   "short_name": "bemaru",
   "description": "백엔드, 보안, AI Agent Engineering의 문제 해결과 기술적 판단을 기록합니다.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f7f4",
-  "theme_color": "#f7f7f4",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": []
 }
