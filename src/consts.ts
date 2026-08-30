@@ -1,5 +1,5 @@
 export const SITE_TITLE = 'bemaru';
-export const SITE_NAME = 'bemaru 기술 블로그';
+export const SITE_NAME = 'bemaru';
 export const SITE_DESCRIPTION =
   '백엔드, 보안, AI Agent Engineering에서 직접 검증한 문제 해결 과정과 기술적 판단을 기록합니다.';
 export const SITE_URL = 'https://bemaru.github.io';

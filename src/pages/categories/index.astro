@@ -8,39 +8,28 @@ const posts = await getSitePosts();
 const categories = CATEGORIES.map((category) => ({
   ...category,
   count: getCategoryCount(posts, category.slug),
-}));
+})).filter((category) => category.count > 0);
 ---
 
 <BaseLayout
   title="카테고리"
-  description="AI Engineering, Backend & Search, Security Engineering, Engineering Practice로 기술 글을 분류합니다."
+  description="카테고리별 글 목록입니다."
 >
   <section class="page-header shell">
     <p class="page-eyebrow">Categories</p>
     <h1>카테고리</h1>
-    <p>기술 스택보다 문제 영역을 중심으로 분류합니다.</p>
   </section>
 
   <section class="section shell">
     <div class="category-grid">
       {categories.map((category) => (
-        category.count > 0 ? (
-          <a class="category-card" href={`/categories/${category.slug}/`}>
-            <div class="category-card-head">
-              <h2>{category.name}</h2>
-              <span>{category.count}</span>
-            </div>
-            <p>{category.description}</p>
-          </a>
-        ) : (
-          <div class="category-card category-card-disabled">
-            <div class="category-card-head">
-              <h2>{category.name}</h2>
-              <span>0</span>
-            </div>
-            <p>{category.description}</p>
+        <a class="category-card" href={`/categories/${category.slug}/`}>
+          <div class="category-card-head">
+            <h2>{category.name}</h2>
+            <span>{category.count}</span>
           </div>
-        )
+          <p>{category.description}</p>
+        </a>
       ))}
     </div>
   </section>
