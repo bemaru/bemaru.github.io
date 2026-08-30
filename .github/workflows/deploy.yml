@@ -30,12 +30,16 @@ jobs:
           cache: npm
 
       - name: Setup GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
       - name: Validate and build
+        env:
+          PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.PUBLIC_GOOGLE_SITE_VERIFICATION }}
+          PUBLIC_NAVER_SITE_VERIFICATION: ${{ vars.PUBLIC_NAVER_SITE_VERIFICATION }}
+          PUBLIC_ADSENSE_CLIENT: ${{ vars.PUBLIC_ADSENSE_CLIENT }}
         run: npm run validate
 
       - name: Upload Pages artifact

@@ -1,24 +1,50 @@
 ---
 import { render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { getSitePosts, type Post } from '../../utils/content';
+import {
+  getRelatedPosts,
+  getSitePosts,
+  type Post,
+} from '../../utils/content';
+import { collectSeries } from '../../utils/series';
 
 export async function getStaticPaths() {
   const posts = await getSitePosts();
-  return posts.map((post) => ({
+  const seriesGroups = collectSeries(posts);
+
+  return posts.map((post, index) => ({
     params: { id: post.id },
-    props: { post },
+    props: {
+      post,
+      newerPost: index > 0 ? posts[index - 1] : undefined,
+      olderPost: index < posts.length - 1 ? posts[index + 1] : undefined,
+      relatedPosts: getRelatedPosts(post, posts),
+      seriesPosts: post.data.series
+        ? seriesGroups.find((group) => group.slug === post.data.series?.slug)?.posts ?? []
+        : [],
+    },
   }));
 }
 
 interface Props {
   post: Post;
+  newerPost?: Post;
+  olderPost?: Post;
+  relatedPosts: Post[];
+  seriesPosts: Post[];
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, newerPost, olderPost, relatedPosts, seriesPosts } = Astro.props;
+const { Content, headings } = await render(post);
 ---
 
-<PostLayout post={post}>
+<PostLayout
+  post={post}
+  headings={headings}
+  newerPost={newerPost}
+  olderPost={olderPost}
+  relatedPosts={relatedPosts}
+  seriesPosts={seriesPosts}
+>
   <Content />
 </PostLayout>

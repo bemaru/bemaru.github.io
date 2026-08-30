@@ -2,7 +2,8 @@
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SITE_DESCRIPTION, SITE_NAME } from '../consts';
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import '../styles/global.css';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
   description?: string;
   canonicalPath?: string;
   canonicalUrl?: URL | string;
+  imagePath?: string;
   type?: 'website' | 'article';
   noindex?: boolean;
   contentClass?: string;
@@ -20,13 +22,12 @@ const {
   description = SITE_DESCRIPTION,
   canonicalPath,
   canonicalUrl,
+  imagePath,
   type = 'website',
   noindex = false,
   contentClass = '',
 } = Astro.props;
-const documentTitle = title
-  ? `${title} | ${SITE_TITLE}`
-  : `${SITE_TITLE} — Developer Blog`;
+const documentTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 ---
 
 <!doctype html>
@@ -37,6 +38,7 @@ const documentTitle = title
       description={description}
       canonicalPath={canonicalPath}
       canonicalUrl={canonicalUrl}
+      imagePath={imagePath}
       type={type}
       noindex={noindex}
     />
