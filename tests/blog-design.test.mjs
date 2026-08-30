@@ -55,6 +55,12 @@ test('approved copy and summit evidence remain intact', () => {
   assert.match(about, /보안 제품의 백엔드와 AI 에이전트를 개발하고 있습니다/);
   assert.match(post, /publishedAt: 2026-08-21/);
   assert.match(post, /draft: false/);
+  assert.match(post, /## 행사에서 반복해서 다뤄진 세 가지 주제/);
+  assert.match(post, /### 1\. 모든 기능에 MCP가 필요한 것은 아니다/);
+  assert.match(post, /MCP를 실시간 시스템에 접근하는 수단으로/);
+  assert.doesNotMatch(post, /MCP가 정말 필요한 문제인가/);
+  assert.doesNotMatch(post, /맞닿아 있어 특히 와닿았습니다/);
+  assert.doesNotMatch(post, /실제 대상에 실행할 권한/);
   assert.equal((post.match(/^!\[/gm) ?? []).length, 8);
   assert.equal(existsSync(new URL('../src/content/posts/restarting-developer-blog.md', import.meta.url)), false);
   assert.equal(existsSync(new URL('../src/content/projects/developer-blog.md', import.meta.url)), false);
