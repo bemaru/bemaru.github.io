@@ -38,6 +38,15 @@ test('narrow viewports are not forced wider than their content area', () => {
   assert.doesNotMatch(styles, /body\s*\{[^}]*min-width:\s*320px/s);
 });
 
+test('article media keeps its aspect ratio and responsive grouping', () => {
+  const styles = read('src/styles/global.css');
+
+  assert.match(styles, /\.prose figure img\s*\{[^}]*display:\s*block;[^}]*width:\s*100%;[^}]*height:\s*auto;/s);
+  assert.match(styles, /\.prose \.photo-pair\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);/s);
+  assert.match(styles, /\.prose figcaption\s*\{[^}]*color:\s*var\(--text-soft\);[^}]*font-size:\s*0\.85rem;/s);
+  assert.match(styles, /@media \(max-width:\s*640px\)[\s\S]*?\.prose \.photo-pair\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\);/s);
+});
+
 test('approved copy and summit evidence remain intact', () => {
   const about = read('dist/about/index.html');
   const post = read('src/content/posts/mcp-dev-summit-seoul-2026.md');
